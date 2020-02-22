@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTool.macOS", "TestTool.macOS\TestTool.macOS.csproj", "{C774A3D1-8BB7-46FC-B4E2-DDB6632C77FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSynthesizer", "KSynthesizer\KSynthesizer.csproj", "{6D7ADFA1-ED95-49FA-A7A3-BEE2CD4589D8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C774A3D1-8BB7-46FC-B4E2-DDB6632C77FA}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{C774A3D1-8BB7-46FC-B4E2-DDB6632C77FA}.Debug|Any CPU.Build.0 = Debug|x86
+		{C774A3D1-8BB7-46FC-B4E2-DDB6632C77FA}.Release|Any CPU.ActiveCfg = Release|x86
+		{C774A3D1-8BB7-46FC-B4E2-DDB6632C77FA}.Release|Any CPU.Build.0 = Release|x86
+		{6D7ADFA1-ED95-49FA-A7A3-BEE2CD4589D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D7ADFA1-ED95-49FA-A7A3-BEE2CD4589D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D7ADFA1-ED95-49FA-A7A3-BEE2CD4589D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D7ADFA1-ED95-49FA-A7A3-BEE2CD4589D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
