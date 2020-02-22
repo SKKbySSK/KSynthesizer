@@ -3,7 +3,10 @@
   <component name="ContentModelStore">
     <e p="$PROJECT_DIR$" t="IncludeFlat">
       <e p="KSynthesizer" t="IncludeRecursive">
+        <e p="AudioFormat.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
+        <e p="IAudioOutput.cs" t="Include" />
+        <e p="IAudioSource.cs" t="Include" />
         <e p="KSynthesizer.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
@@ -14,6 +17,11 @@
               <e p="KSynthesizer.AssemblyInfo.cs" t="Include" />
             </e>
           </e>
+        </e>
+        <e p="Sources" t="Include">
+          <e p="FunctionalAudioSourceBase.cs" t="Include" />
+          <e p="PeriodicSourceBase.cs" t="Include" />
+          <e p="SinSource.cs" t="Include" />
         </e>
       </e>
       <e p="packages" t="ExcludeRecursive" />
@@ -29,10 +37,14 @@
         <e p="Main.cs" t="Include" />
         <e p="Main.storyboard" t="Include" />
         <e p="obj" t="ExcludeRecursive" />
+        <e p="packages.config" t="Include" />
         <e p="Resources" t="Include" />
         <e p="TestTool.macOS.csproj" t="IncludeRecursive" />
         <e p="ViewController.cs" t="Include" />
         <e p="ViewController.designer.cs" t="Include" />
+        <e p="Views" t="Include">
+          <e p="AudioSourceView.cs" t="Include" />
+        </e>
       </e>
     </e>
     <e p="$USER_HOME$/Library/Caches/Rider2019.2/extResources" t="IncludeRecursive" />
