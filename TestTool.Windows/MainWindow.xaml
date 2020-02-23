@@ -11,7 +11,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="198*"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -32,8 +32,16 @@
                 <panels:OscillatorPanel x:Name="oscPanel"/>
             </TabItem>
         </TabControl>
-        <Label Content="Mixer" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top"/>
-        <Views:WaveView x:Name="mixerView" Grid.Column="1" Grid.Row="1" Margin="10,26,10,10"/>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Views:WaveView x:Name="mixerView" Grid.Row="0" Margin="0,26,0,0" MinimumSampleSize="512"/>
+            <Views:FftView x:Name="fftView" Grid.Row="1" NeedBuffer="fftView_NeedBuffer" Margin="0,26,0,0"/>
+            <Label Content="Mixer" VerticalAlignment="Top" Margin="10,0,0,0"/>
+            <CheckBox x:Name="fftCheckbox" Height="26" VerticalContentAlignment="Center" Content="FFT" VerticalAlignment="Top" Margin="10,0,0,0" Grid.Row="1"/>
+        </Grid>
         <StackPanel Grid.Column="1" Grid.Row="2">
             <Views:LabelSlider x:Name="volumeSlider" Format="Vol 'int'%" Maximum="100" Minimum="0" Value="50" ValueChanged="volumeSlider_ValueChanged"/>
             <Button x:Name="toggleButton" Content="Play" Width="100"  HorizontalAlignment="Right" Margin="10" Click="toggleButton_Click"/>

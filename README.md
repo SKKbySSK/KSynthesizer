@@ -28,6 +28,12 @@
     - Windows向けのデバッグツール
     - 波形表示やオシレータの調整が可能
     
+## FFTについて
+画面上でFFTを確認できますが、周波数分解能が86Hzくらいなのでごく低周波では大して使えないです。
+原因としては、FFTする際に最大でも512サンプルしか渡してないので、44100Hz/512=86Hzとなるからです。
+必要ならWAVファイルをエクスポートして、古いですがこちらのツール等で解析するといいかと。
+[WaveSpectra](http://efu.jp.net/soft/ws/ws.html)
+
 ## 実装
 - [x] Sin波
 - [x] 矩形波
@@ -51,3 +57,5 @@
 [音階と周波数](https://tomari.org/main/java/oto.html)
 
 [LPF](https://org-technology.com/posts/low-pass-filter.html)
+
+[実波形とフーリエ変換](http://www.fbs.osaka-u.ac.jp/labs/ishijima/FFT-05.html)

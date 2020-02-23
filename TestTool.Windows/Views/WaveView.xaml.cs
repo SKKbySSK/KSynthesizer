@@ -33,6 +33,8 @@ namespace TestTool.Windows.Views
 
         private DispatcherTimer Timer;
 
+        public int MinimumSampleSize { get; set; } = 256;
+
         private void updatePlot(object sender, EventArgs e)
         {
             // Read buffer for 1 period
@@ -43,12 +45,12 @@ namespace TestTool.Windows.Views
                 return;
             }
 
-            int sample = 200;
+            int sample = MinimumSampleSize;
             float[] buffer;
 
             if (PlotSource is PeriodicSourceBase periodic)
             {
-                sample = Math.Max((int)(PlotSource.Format.SampleRate * periodic.Period / 1000), 200);
+                sample = Math.Max((int)(PlotSource.Format.SampleRate * periodic.Period / 1000), MinimumSampleSize);
             }
 
 

@@ -8,6 +8,9 @@
     <Compile Update="Panels\OscillatorPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\FftView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\LabelSlider.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -23,6 +26,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Panels\OscillatorPanel.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\FftView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\LabelSlider.xaml">

@@ -78,6 +78,7 @@ namespace TestTool.Windows
             _output.Pause();
             oscPanel.Pause();
             mixerView.Pause();
+            fftView.Pause();
             toggleButton.Content = "Play";
         }
 
@@ -86,6 +87,7 @@ namespace TestTool.Windows
             _output.Play();
             oscPanel.Play();
             mixerView.Play();
+            fftView.Play();
             toggleButton.Content = "Pause";
         }
 
@@ -129,6 +131,14 @@ namespace TestTool.Windows
                 }
 
                 window.ShowDialog();
+            }
+        }
+
+        private void fftView_NeedBuffer(object sender, EventArgs e)
+        {
+            if (fftCheckbox.IsChecked ?? false)
+            {
+                fftView.Process(MainMixer.LastBuffer, MainMixer.Format.SampleRate);
             }
         }
     }
