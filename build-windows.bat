@@ -1,0 +1,1 @@
+dotnet build TestTool.Windows/TestTool.Windows.csproj -c Release --no-incremental -o Release/
