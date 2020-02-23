@@ -45,39 +45,40 @@ namespace TestTool.Windows.Views
                 buttons[(FunctionType)func] = radio;
             }
 
-            wave.PlotSource = PlotSource;
+            wave.PlotSource = Source;
         }
 
         public FunctionType Function
         {
             get => Source.Function;
-            set
-            {
-                Source.Function = value;
-                PlotSource.Function = value;
-            }
+            set =>Source.Function = value;
         }
 
-        public PeriodicFunctionsSource Source { get; } = new PeriodicFunctionsSource(44100);
-
-        public PeriodicFunctionsSource PlotSource { get; } = new PeriodicFunctionsSource(44100);
+        internal CustomFunctionsSource Source { get; } = new CustomFunctionsSource(44100);
 
         private void LabelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Source.SetFrequency((float)e.NewValue);
-            PlotSource.SetFrequency((float)e.NewValue);
         }
 
         private void dcSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Source.DcValue = (float)e.NewValue;
-            PlotSource.DcValue = (float)e.NewValue;
         }
 
         private void rectDuty_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Source.RectDuty = (float)e.NewValue;
-            PlotSource.RectDuty = (float)e.NewValue;
+        }
+
+        public void StartPreview()
+        {
+            wave.Play();
+        }
+
+        public void StopPreview()
+        {
+            wave.Pause();
         }
     }
 }

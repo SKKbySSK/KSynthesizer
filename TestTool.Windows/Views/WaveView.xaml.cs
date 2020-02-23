@@ -31,11 +31,7 @@ namespace TestTool.Windows.Views
 
         private OxyPlot.Axes.LinearAxis WaveYAxis { get; } = new OxyPlot.Axes.LinearAxis() { Minimum = -1.1, Maximum = 1.1, Position = OxyPlot.Axes.AxisPosition.Left };
 
-        internal void StartPlotTimer()
-        {
-            var timer = new DispatcherTimer(TimeSpan.FromSeconds(0.1), DispatcherPriority.Loaded, new EventHandler(updatePlot), Dispatcher);
-            timer.Start();
-        }
+        private DispatcherTimer Timer;
 
         private void updatePlot(object sender, EventArgs e)
         {
@@ -48,19 +44,34 @@ namespace TestTool.Windows.Views
             }
 
             int sample = 200;
+            float[] buffer;
+
             if (PlotSource is PeriodicSourceBase periodic)
             {
                 sample = Math.Max((int)(PlotSource.Format.SampleRate * periodic.Period / 1000), 200);
             }
 
+
+            if (PlotSource is ILastBufferRecord customSource)
+            {
+                customSource.BufferLength = sample;
+                buffer = customSource.LastBuffer;
+            }
+            else
+            {
+                buffer = PlotSource.Next(sample);
+            }
+
             WaveXAxis.Maximum = sample / (double)PlotSource.Format.SampleRate;
-            var buffer = PlotSource.Next(sample);
             WaveSeries.Points.Clear();
 
-            for (int i = 0; buffer.Length > i; i++)
+            if (buffer.Length > 0)
             {
-                double time = i / (double)(PlotSource.Format.SampleRate - 1);
-                WaveSeries.Points.Add(new OxyPlot.DataPoint(time, buffer[i]));
+                for (int i = 0; buffer.Length > i; i++)
+                {
+                    double time = i / (double)(PlotSource.Format.SampleRate - 1);
+                    WaveSeries.Points.Add(new OxyPlot.DataPoint(time, buffer[i]));
+                }
             }
 
             WavePlotModel.InvalidatePlot(true);
@@ -69,12 +80,24 @@ namespace TestTool.Windows.Views
         public WaveView()
         {
             InitializeComponent();
+            Timer = new DispatcherTimer(TimeSpan.FromSeconds(0.1), DispatcherPriority.Loaded, new EventHandler(updatePlot), Dispatcher);
+            Timer.Stop();
+
             WavePlotModel.Axes.Add(WaveXAxis);
             WavePlotModel.Axes.Add(WaveYAxis);
             WavePlotModel.Series.Add(WaveSeries);
             WaveSeries.LineJoin = OxyPlot.LineJoin.Round;
             wavePlot.Model = WavePlotModel;
-            StartPlotTimer();
+        }
+
+        public void Play()
+        {
+            Timer.Start();
+        }
+
+        public void Pause()
+        {
+            Timer.Stop();
         }
     }
 }

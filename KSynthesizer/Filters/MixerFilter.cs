@@ -19,7 +19,7 @@ namespace KSynthesizer.Filters
 
         public MixerMode Mode { get; set; } = MixerMode.Average;
         
-        public unsafe float[] Next(int size)
+        public unsafe virtual float[] Next(int size)
         {
             var buffer = new float[size];
             float val;

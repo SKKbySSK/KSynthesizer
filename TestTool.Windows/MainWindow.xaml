@@ -3,21 +3,45 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TestTool.Windows"
-        xmlns:Views="clr-namespace:TestTool.Windows.Views" x:Class="TestTool.Windows.MainWindow"
+        xmlns:panels="clr-namespace:TestTool.Windows.Panels"
+        xmlns:Views="clr-namespace:TestTool.Windows.Views"
+        xmlns:local="clr-namespace:TestTool.Windows" x:Class="TestTool.Windows.MainWindow"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="198*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Views:Oscillator x:Name="osc1" Margin="0"/>
-        <Views:Oscillator x:Name="osc2" Grid.Row="1" Margin="0"/>
-        <Views:WaveView x:Name="mixerView" Grid.Column="1" Margin="10,10,10,10"/>
+        <Menu>
+            <MenuItem Header="File">
+                <MenuItem Header="Export">
+                    <MenuItem x:Name="exportOsc1" Header="OSC1" Click="exportOsc1_Click"/>
+                    <MenuItem x:Name="exportOsc2" Header="OSC2" Click="exportOsc2_Click"/>
+                    <MenuItem x:Name="exportMixer" Header="Mixer" Click="exportMixer_Click"/>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <TabControl x:Name="tab" Grid.Row="1" Grid.RowSpan="2">
+            <TabItem x:Name="oscTab" Header="OSC">
+                <panels:OscillatorPanel x:Name="oscPanel"/>
+            </TabItem>
+        </TabControl>
+        <Label Content="Mixer" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top"/>
+        <Views:WaveView x:Name="mixerView" Grid.Column="1" Grid.Row="1" Margin="10,26,10,10"/>
+        <StackPanel Grid.Column="1" Grid.Row="2">
+            <Views:LabelSlider x:Name="volumeSlider" Format="Vol 'int'%" Maximum="100" Minimum="0" Value="50" ValueChanged="volumeSlider_ValueChanged"/>
+            <Button x:Name="toggleButton" Content="Play" Width="100"  HorizontalAlignment="Right" Margin="10" Click="toggleButton_Click"/>
+        </StackPanel>
+
+
+        <Grid x:Name="progressOverlay" Background="White" Grid.ColumnSpan="20" Grid.RowSpan="20" Visibility="Hidden">
+            <ProgressBar HorizontalAlignment="Center" VerticalAlignment="Center" IsIndeterminate="True" Height="20" Width="200"/>
+        </Grid>
     </Grid>
 </Window>

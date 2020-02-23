@@ -2,6 +2,12 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
+    <Compile Update="DurationDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Panels\OscillatorPanel.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\LabelSlider.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -13,6 +19,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="DurationDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Panels\OscillatorPanel.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\LabelSlider.xaml">
       <SubType>Designer</SubType>
     </Page>

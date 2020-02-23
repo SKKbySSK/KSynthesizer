@@ -1,0 +1,15 @@
+﻿<Window x:Class="TestTool.Windows.DurationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestTool.Windows"
+        mc:Ignorable="d"
+        Title="DurationDialog" Height="120" Width="458" ResizeMode="NoResize" WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <TextBox x:Name="durationBox" Margin="10,10,37,0" Text="10" HorizontalContentAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <Label Content="秒" HorizontalAlignment="Right" Margin="0,6,10,0" VerticalAlignment="Top"/>
+        <Button Content="保存" Margin="0,38,10,10" HorizontalAlignment="Right" Width="80" Click="Button_Click"/>
+
+    </Grid>
+</Window>

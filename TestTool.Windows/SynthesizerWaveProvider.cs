@@ -7,7 +7,7 @@ using NAudio.Wave.SampleProviders;
 
 namespace TestTool.Windows
 {
-    
+
     public class SynthesizerWaveProvider : IWaveProvider
     {
         class Sample : ISampleProvider
@@ -21,11 +21,11 @@ namespace TestTool.Windows
 
                 var data = Source.Next(count);
                 fixed (float* source = data)
-                fixed(float* dst = buffer)
+                fixed (float* dst = buffer)
                 {
                     for (int i = 0; count > i; i++)
                     {
-                        dst[i] = source[i];
+                        dst[i] = source[i] * Volume;
                     }
                 }
 
@@ -33,10 +33,12 @@ namespace TestTool.Windows
             }
 
             public WaveFormat WaveFormat { get; } = WaveFormat.CreateIeeeFloatWaveFormat(44100, 1);
-            
+
             public IAudioSource Source { get; set; }
+
+            public float Volume { get; set; } = 1;
         }
-        
+
         public SynthesizerWaveProvider()
         {
             Converter = new SampleToWaveProvider(SampleProvider);
@@ -47,10 +49,16 @@ namespace TestTool.Windows
             get => SampleProvider.Source;
             set => SampleProvider.Source = value;
         }
-        
+
         private Sample SampleProvider { get; } = new Sample();
-        
+
         private SampleToWaveProvider Converter { get; }
+
+        public float Volume
+        {
+            get => SampleProvider.Volume;
+            set => SampleProvider.Volume = value;
+        }
         
         public int Read(byte[] buffer, int offset, int count)
         {
