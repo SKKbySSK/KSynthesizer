@@ -6,13 +6,13 @@ namespace KSynthesizer
         {
             SampleRate = sampleRate;
             Channels = channels;
-            this.bitDepth = bitDepth;
+            BitDepth = bitDepth;
         }
 
         public int SampleRate { get; }
         
         public int Channels { get; }
         
-        public int bitDepth { get; }
+        public int BitDepth { get; }
     }
 }

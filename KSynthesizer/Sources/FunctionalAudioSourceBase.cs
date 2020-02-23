@@ -2,22 +2,15 @@ namespace KSynthesizer.Sources
 {
     public abstract class FunctionalAudioSourceBase : IAudioSource
     {
-        public FunctionalAudioSourceBase(int bufferSize)
-        {
-            BufferSize = bufferSize;
-        }
-        
-        public int BufferSize { get; }
-        
-        public AudioFormat Format { get; protected set; }
+        public virtual AudioFormat Format { get; protected set; }
 
-        public double Position { get; protected set; }
+        public virtual double Position { get; protected set; }
 
-        protected float[] GetNextBuffer()
+        protected virtual float[] GetNextBuffer(int size)
         {
-            return new float[BufferSize];
+            return new float[size];
         }
 
-        public abstract float[] Next();
+        public abstract float[] Next(int size);
     }
 }

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
-    <e p="$PROJECT_DIR$" t="IncludeFlat">
+    <e p="C:\Users\skkby\.Rider2019.3\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\skkby\.Rider2019.3\system\resharper-host\local\Transient\ReSharperHost\v193\SolutionCaches\_Synthesizer.-682633002.00" t="ExcludeRecursive" />
+    <e p="C:\Users\skkby\Documents\Projects\KSynthesizer" t="IncludeFlat">
       <e p="KSynthesizer" t="IncludeRecursive">
         <e p="AudioFormat.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
@@ -27,27 +29,36 @@
       <e p="packages" t="ExcludeRecursive" />
       <e p="Synthesizer.sln" t="IncludeFlat" />
       <e p="TestTool.macOS" t="IncludeRecursive">
-        <e p="AppDelegate.cs" t="Include" />
-        <e p="Assets.xcassets" t="Include">
-          <e p="Contents.json" t="Include" />
-        </e>
-        <e p="bin" t="ExcludeRecursive" />
-        <e p="Entitlements.plist" t="Include" />
-        <e p="Info.plist" t="Include" />
-        <e p="Main.cs" t="Include" />
-        <e p="Main.storyboard" t="Include" />
-        <e p="obj" t="ExcludeRecursive" />
-        <e p="packages.config" t="Include" />
-        <e p="Resources" t="Include" />
         <e p="TestTool.macOS.csproj" t="IncludeRecursive" />
-        <e p="ViewController.cs" t="Include" />
-        <e p="ViewController.designer.cs" t="Include" />
+      </e>
+      <e p="TestTool.Windows" t="IncludeRecursive">
+        <e p="App.xaml" t="Include" />
+        <e p="App.xaml.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="MainWindow.xaml" t="Include" />
+        <e p="MainWindow.xaml.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="App.g.cs" t="Include" />
+              <e p="MainWindow.g.cs" t="Include" />
+              <e p="TestTool.Windows.AssemblyInfo.cs" t="Include" />
+              <e p="Views" t="Include">
+                <e p="LabelSlider.g.cs" t="Include" />
+                <e p="Oscillator.g.cs" t="Include" />
+              </e>
+            </e>
+          </e>
+        </e>
+        <e p="SynthesizerWaveProvider.cs" t="Include" />
+        <e p="TestTool.Windows.csproj" t="IncludeRecursive" />
         <e p="Views" t="Include">
-          <e p="AudioSourceView.cs" t="Include" />
+          <e p="LabelSlider.xaml" t="Include" />
+          <e p="LabelSlider.xaml.cs" t="Include" />
+          <e p="Oscillator.xaml" t="Include" />
+          <e p="Oscillator.xaml.cs" t="Include" />
         </e>
       </e>
     </e>
-    <e p="$USER_HOME$/Library/Caches/Rider2019.2/extResources" t="IncludeRecursive" />
-    <e p="$USER_HOME$/Library/Caches/Rider2019.2/resharper-host/local/Transient/ReSharperHost/v192/SolutionCaches/_Synthesizer.498519346.00" t="ExcludeRecursive" />
   </component>
 </project>
