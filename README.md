@@ -1,11 +1,29 @@
 # KSynthesizer
 4Eのデザイン実験で用いるシンセサイザーライブラリ
 
+## 実行方法
+
+### SDKのインストール（初回のみ）
+- [.Net Core 3.1 SDK](https://github.com/dotnet/core/blob/master/release-notes/3.1/3.1.2/3.1.2.md)をダウンロード
+    - Windowsの場合はSDK Installer->x64で基本的にOK
+    - Raspbianの場合はSDK Binaries->ARM
+
+### テストツールを使う場合
+- build-windows.batをダブルクリック
+- Release/TestTool.Windows.exeを実行
+
+### Raspberry Piで試す場合
+未定
+
+### カスタムビルドをする場合
+- Visual Studioをインストール
+- Synthesizer.slnを開く
+
 ## 構成
 - KSynthesizer
     - シンセサイザーのコアライブラリ
     - クロスプラットフォーム対応
-    - .Net Standard 2.1, .Net Core 3.0
+    - .Net Standard 2.1, .Net Core 3.1
 - TestTool.Windows
     - Windows向けのデバッグツール
     - 波形表示やオシレータの調整が可能
