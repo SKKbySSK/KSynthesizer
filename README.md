@@ -59,3 +59,5 @@
 [LPF](https://org-technology.com/posts/low-pass-filter.html)
 
 [実波形とフーリエ変換](http://www.fbs.osaka-u.ac.jp/labs/ishijima/FFT-05.html)
+
+[ADSR Envelope](https://www.wikiaudio.org/adsr-envelope/)
