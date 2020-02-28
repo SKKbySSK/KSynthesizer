@@ -19,7 +19,7 @@
 #### (2) 手動ビルド
 - 任意の場所で
 ```
-sudo apt-get install cmake curl libunwind8 gettext apt-transport-https libasound2-dev
+sudo apt-get install cmake libasound2-dev
 git clone https://github.com/andrewrk/libsoundio.git
 cd libsoundio/
 mkdir build && cd build && cmake ..
@@ -27,12 +27,18 @@ make
 ```
 - libsoundio.a, libsoundio.so, libsoundio.so.2ができているはず
 
-#### TestTool.Platform
+#### TestTool.Platformのインストール手順
+Windows上で
 - bash等で`sh publish-linux-arm.sh`
 - build/linux-arm/にlibsoundio.a, libsoundio.so, libsoundio.so.2をコピー
 - `sh publish-and-sync.sh`
 - ラズパイの`/home/pi/TestTool.Platform`にlinux-arm以下がすべてコピーされる
-- ラズパイのターミナル上で`/home/pi/TestTool.Platform`へ移動して`TestTool.Platform`を実行する
+
+次に、Raspberry Pi上で
+- ラズパイのターミナル上で`/home/pi/TestTool.Platform`へ移動
+- `chmod 755 TestTool.Platform`
+- `./TestTool.Platform`
+- 440Hzの音が出れば成功
 
 ### カスタムビルドをする場合
 - Visual Studioをインストール
