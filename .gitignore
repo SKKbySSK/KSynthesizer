@@ -3,3 +3,4 @@ obj/
 /packages/
 .vs/
 Release/
+.DS_Store
