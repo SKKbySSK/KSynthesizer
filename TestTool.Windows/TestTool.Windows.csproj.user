@@ -5,6 +5,12 @@
     <Compile Update="DurationDialog.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="FrequencyDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Panels\FilterPanel.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Panels\OscillatorPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -23,6 +29,12 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="DurationDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="FrequencyDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Panels\FilterPanel.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Panels\OscillatorPanel.xaml">

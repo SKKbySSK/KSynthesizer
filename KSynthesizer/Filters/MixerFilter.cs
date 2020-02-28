@@ -13,7 +13,7 @@ namespace KSynthesizer.Filters
 
     public class MixerFilter : IAudioSource
     {
-        public AudioFormat Format => Sources.First()?.Format ?? new AudioFormat(44100, 1, 32);
+        public AudioFormat Format => Sources.FirstOrDefault()?.Format ?? new AudioFormat(44100, 1, 32);
 
         public List<IAudioSource> Sources { get; } = new List<IAudioSource>();
 

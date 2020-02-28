@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSynthesizer;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,13 +23,17 @@ namespace TestTool.Windows.Views
     {
         public event EventHandler NeedBuffer;
 
+        public int SampleRate { get; } = 44100;
+
         private OxyPlot.PlotModel WavePlotModel { get; } = new OxyPlot.PlotModel();
 
         private OxyPlot.Series.LineSeries WaveSeries { get; } = new OxyPlot.Series.LineSeries();
 
         private OxyPlot.Axes.LogarithmicAxis WaveXAxis { get; } = new OxyPlot.Axes.LogarithmicAxis() { Minimum = 0, Maximum = 1, Position = OxyPlot.Axes.AxisPosition.Bottom };
 
-        private OxyPlot.Axes.LinearAxis WaveYAxis { get; } = new OxyPlot.Axes.LinearAxis() { Minimum = 0, Maximum = 1.1, Position = OxyPlot.Axes.AxisPosition.Left };
+        private OxyPlot.Axes.LinearAxis WaveYAxis { get; } = new OxyPlot.Axes.LinearAxis() { Minimum = 0, Maximum = 15, Position = OxyPlot.Axes.AxisPosition.Left };
+
+        private BufferSink<float> Sink { get; }
 
         private DispatcherTimer Timer;
 
@@ -37,10 +42,10 @@ namespace TestTool.Windows.Views
             NeedBuffer?.Invoke(this, EventArgs.Empty);
         }
 
-        public FftView()
+        public FftView(int size = 4096)
         {
             InitializeComponent();
-            Timer = new DispatcherTimer(TimeSpan.FromSeconds(0.5), DispatcherPriority.Loaded, new EventHandler(updatePlot), Dispatcher);
+            Timer = new DispatcherTimer(TimeSpan.FromSeconds(0.05), DispatcherPriority.Loaded, new EventHandler(updatePlot), Dispatcher);
             Timer.Stop();
 
 
@@ -48,9 +53,27 @@ namespace TestTool.Windows.Views
             WavePlotModel.Axes.Add(WaveYAxis);
             WavePlotModel.Series.Add(WaveSeries);
             plotView.Model = WavePlotModel;
+
+            Sink = new BufferSink<float>(size);
+            Sink.Filled += Sink_Filled;
         }
 
-        public unsafe void Process(float[] buffer, int sampleRate)
+        public FftView() : this(4096)
+        {
+
+        }
+
+        private void Sink_Filled(object sender, EventArgs e)
+        {
+            Process(Sink.Pop(), SampleRate);
+        }
+
+        public void Push(float[] buffer)
+        {
+            Sink.Push(buffer, false);
+        }
+
+        private unsafe void Process(float[] buffer, int sampleRate)
         {
             int length = 1;
             while (length <= buffer.Length)
@@ -76,7 +99,6 @@ namespace TestTool.Windows.Views
 
             double delta_freq = sampleRate / length;
             double range_freq = sampleRate / 2;
-            double maxY = 0;
 
             WaveSeries.Points.Clear();
 
@@ -87,16 +109,14 @@ namespace TestTool.Windows.Views
 
                 WaveSeries.Points.Add(new OxyPlot.DataPoint(1, 0));
                 WaveSeries.Points.Add(new OxyPlot.DataPoint(delta_freq - 1, 0));
-                for (int i = 0; length > i; i++)
+                for (int i = 1; length > i; i++)
                 {
                     abs = Math.Sqrt(Math.Pow(re[i], 2) + Math.Pow(im[i], 2));
-                    maxY = Math.Max(abs, maxY);
-                    WaveSeries.Points.Add(new OxyPlot.DataPoint(delta_freq * (i + 1), abs));
+                    WaveSeries.Points.Add(new OxyPlot.DataPoint(delta_freq * i, abs));
                 }
             }
 
             WaveXAxis.Maximum = range_freq;
-            WaveYAxis.Maximum = maxY + 1;
             WavePlotModel.InvalidatePlot(true);
         }
 

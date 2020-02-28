@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using KSynthesizer;
 using KSynthesizer.Filters;
+using KSynthesizer.Sources;
 using Microsoft.Win32;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
@@ -30,23 +31,70 @@ namespace TestTool.Windows
         private WasapiOut _output = new WasapiOut(AudioClientShareMode.Shared, 300);
         private SynthesizerWaveProvider _provider = new SynthesizerWaveProvider();
 
-        internal CustomMixerFilter MainMixer { get; } = new CustomMixerFilter();
+        internal MixerFilter MainMixer { get; } = new MixerFilter();
+
+        private LastRecordFilter<FrequencyFilter> FrequencyFilter { get; }
+
+        private LastRecordFilter<MixerFilter> OutputSource { get; }
 
         public MainWindow()
         {
             InitializeComponent();
 
+            FrequencyFilter = new LastRecordFilter<FrequencyFilter>(new FrequencyFilter(MainMixer));
+            filterPanel.Filter = FrequencyFilter;
+
+            var passSource = new MixerFilter();
+            passSource.Sources.Add(FrequencyFilter);
+            OutputSource = new LastRecordFilter<MixerFilter>(passSource);
+
             BuildMixer();
-            _provider.Source = MainMixer;
+            BuildExport();
+            _provider.Source = OutputSource;
             _output.Init(_provider);
 
-            mixerView.PlotSource = MainMixer;
+            mixerView.PlotSource = OutputSource;
         }
 
         private void BuildMixer()
         {
             MainMixer.Sources.Add(oscPanel.Osc1);
             MainMixer.Sources.Add(oscPanel.Osc2);
+        }
+
+        private void BuildExport()
+        {
+            var sources = new IAudioSource[] { oscPanel.Osc1, oscPanel.Osc2, MainMixer, FrequencyFilter };
+            for (int i = 0; sources.Length > i; i++)
+            {
+                IAudioSource source = sources[i];
+                string text = null;
+                switch (i)
+                {
+                    case 0:
+                        text = "OSC1";
+                        break;
+                    case 1:
+                        text = "OSC2";
+                        break;
+                    case 2:
+                        text = "Mixer";
+                        break;
+                    case 3:
+                        text = "FrequencyFilter";
+                        break;
+                }
+                var item = new MenuItem()
+                {
+                    Header = text,
+                };
+                item.Click += (sender, e) =>
+                {
+                    WriteAudioSource(source);
+                };
+
+                exportItem.Items.Add(item);
+            }
         }
 
         protected override void OnClosed(EventArgs e)
@@ -91,21 +139,6 @@ namespace TestTool.Windows
             toggleButton.Content = "Pause";
         }
 
-        private void exportOsc1_Click(object sender, RoutedEventArgs e)
-        {
-            WriteAudioSource(oscPanel.Osc1);
-        }
-
-        private void exportOsc2_Click(object sender, RoutedEventArgs e)
-        {
-            WriteAudioSource(oscPanel.Osc2);
-        }
-
-        private void exportMixer_Click(object sender, RoutedEventArgs e)
-        {
-            WriteAudioSource(MainMixer);
-        }
-        
         private void WriteAudioSource(IAudioSource source)
         {
             SaveFileDialog sfd = new SaveFileDialog();
@@ -138,7 +171,81 @@ namespace TestTool.Windows
         {
             if (fftCheckbox.IsChecked ?? false)
             {
-                fftView.Process(MainMixer.LastBuffer, MainMixer.Format.SampleRate);
+                fftView.Push(OutputSource.LastBuffer);
+            }
+        }
+
+        private void oscPanel_FrequencyUpdated(object sender, EventArgs e)
+        {
+        }
+
+        private void oscFreq_Click(object sender, RoutedEventArgs e)
+        {
+            Pause();
+
+            PeriodicSourceBase source;
+            if (sender == osc1Freq)
+            {
+                source = oscPanel.Osc1.Source;
+            } 
+            else
+            {
+                source = oscPanel.Osc2.Source;
+            }
+
+            MainMixer.Sources.Clear();
+            MainMixer.Sources.Add(source);
+
+            FrequencyFilter output = FrequencyFilter.Source;
+
+            var window = new FrequencyDialog();
+            window.ExportClicked += Window_ExportClicked;
+            window.ShowDialog();
+
+            void Window_ExportClicked(object sender, FreqEventArgs e)
+            {
+                window.ExportClicked -= Window_ExportClicked;
+
+                ExportFreqCharacteristics(e, source, output);
+            }
+        }
+
+        private async void ExportFreqCharacteristics(FreqEventArgs e, PeriodicSourceBase source, FrequencyFilter output)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "CSV File|*.csv";
+            var now = DateTime.Now;
+            sfd.FileName = $"{now.Month}-{now.Day} {now.Hour}-{now.Minute}-{now.Second}.csv";
+            if (sfd.ShowDialog() ?? false)
+            {
+                List<(double, double)> exportingData = new List<(double, double)>();
+                progressOverlay.Visibility = Visibility.Visible;
+                await Task.Run(() =>
+                {
+                    TimeSpan currentTime = TimeSpan.Zero;
+                    int size = (int)(source.Format.SampleRate * 1);
+                    for (double current = e.From; e.To >= current; current += e.Step)
+                    {
+                        source.SetFrequency((float)current);
+                        var sourceData = source.Next(size);
+                        var outputData = output.Next(size);
+                        var sourceAv = sourceData.Average(f => Math.Abs(f));
+                        var outputAv = outputData.Average(f => Math.Abs(f));
+
+                        var gain = 20 * Math.Log10(outputAv / sourceAv);
+                        exportingData.Add((current, gain));
+                        currentTime += TimeSpan.FromSeconds(0.1);
+                    }
+                });
+
+                using (var sw = new StreamWriter(sfd.FileName))
+                {
+                    foreach(var pair in exportingData)
+                    {
+                        sw.WriteLine($"{pair.Item1}, {pair.Item2}");
+                    }
+                }
+                progressOverlay.Visibility = Visibility.Hidden;
             }
         }
     }

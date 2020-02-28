@@ -61,7 +61,9 @@ namespace TestTool.Windows.Views
             }
             else
             {
-                buffer = PlotSource.Next(sample);
+                Pause();
+                MessageBox.Show("Source is not supported");
+                return;
             }
 
             WaveXAxis.Maximum = sample / (double)PlotSource.Format.SampleRate;

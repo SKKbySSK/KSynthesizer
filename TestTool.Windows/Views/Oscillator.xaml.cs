@@ -23,6 +23,8 @@ namespace TestTool.Windows.Views
     {
         private Dictionary<FunctionType, RadioButton> buttons = new Dictionary<FunctionType, RadioButton>();
 
+        public event EventHandler FrequencyUpdated;
+
         public Oscillator()
         {
             InitializeComponent();
@@ -33,7 +35,7 @@ namespace TestTool.Windows.Views
                 var radio = new RadioButton()
                 {
                     Content = func,
-                    IsChecked = (FunctionType)func == Source.Function,
+                    IsChecked = (FunctionType)func == Source.Source.Function,
                     Margin = new Thickness(5),
                 };
                 radio.Click += (sender, e) =>
@@ -50,25 +52,26 @@ namespace TestTool.Windows.Views
 
         public FunctionType Function
         {
-            get => Source.Function;
-            set =>Source.Function = value;
+            get => Source.Source.Function;
+            set => Source.Source.Function = value;
         }
 
-        internal CustomFunctionsSource Source { get; } = new CustomFunctionsSource(44100);
+        internal LastRecordFilter<PeriodicFunctionsSource> Source { get; } = new LastRecordFilter<PeriodicFunctionsSource>(new PeriodicFunctionsSource(44100));
 
         private void LabelSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Source.SetFrequency((float)e.NewValue);
+            Source.Source.SetFrequency((float)e.NewValue);
+            FrequencyUpdated?.Invoke(this, EventArgs.Empty);
         }
 
         private void dcSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Source.DcValue = (float)e.NewValue;
+            Source.Source.DcValue = (float)e.NewValue;
         }
 
         private void rectDuty_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            Source.RectDuty = (float)e.NewValue;
+            Source.Source.RectDuty = (float)e.NewValue;
         }
 
         public void StartPreview()

@@ -22,9 +22,11 @@ namespace TestTool.Windows.Panels
     /// </summary>
     public partial class OscillatorPanel : UserControl
     {
-        internal CustomFunctionsSource Osc1 => osc1.Source;
+        internal LastRecordFilter<PeriodicFunctionsSource> Osc1 => osc1.Source;
 
-        internal CustomFunctionsSource Osc2 => osc2.Source;
+        internal LastRecordFilter<PeriodicFunctionsSource> Osc2 => osc2.Source;
+
+        public event EventHandler FrequencyUpdated;
 
         public OscillatorPanel()
         {
@@ -41,6 +43,11 @@ namespace TestTool.Windows.Panels
         {
             osc1.StartPreview();
             osc2.StartPreview();
+        }
+
+        private void osc_FrequencyUpdated(object sender, EventArgs e)
+        {
+            FrequencyUpdated?.Invoke(this, e);
         }
     }
 }

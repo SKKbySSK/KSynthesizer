@@ -7,6 +7,10 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <Prefer32Bit>true</Prefer32Bit>
+    </PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="MathNet.Filtering" Version="0.6.0" />
       <PackageReference Include="MathNet.Numerics" Version="4.9.0" />

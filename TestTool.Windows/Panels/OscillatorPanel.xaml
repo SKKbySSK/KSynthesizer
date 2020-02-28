@@ -12,7 +12,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Views:Oscillator x:Name="osc1"/>
-        <Views:Oscillator x:Name="osc2" Grid.Row="1"/>
+        <Views:Oscillator x:Name="osc1" FrequencyUpdated="osc_FrequencyUpdated"/>
+        <Views:Oscillator x:Name="osc2" Grid.Row="1" FrequencyUpdated="osc_FrequencyUpdated"/>
     </Grid>
 </UserControl>
