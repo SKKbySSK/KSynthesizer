@@ -1,19 +1,38 @@
 # KSynthesizer
 4Eのデザイン実験で用いるシンセサイザーライブラリ
 
-## 実行方法
+## 実行方法(TestTool)
 
 ### SDKのインストール（初回のみ）
 - [.Net Core 3.1 SDK](https://github.com/dotnet/core/blob/master/release-notes/3.1/3.1.2/3.1.2.md)をダウンロード
     - Windowsの場合はSDK Installer->x64で基本的にOK
-    - Raspbianの場合はSDK Binaries->ARM
 
-### テストツールを使う場合
+### TestTool.Windowsを使う場合
 - build-windows.batをダブルクリック
 - Release/TestTool.Windows.exeを実行
 
-### Raspberry Piで試す場合
-未定
+### TestTool.Platform Raspberry Pi向けのセットアップ
+
+#### (1) ビルド済みバイナリ
+- libsoundo/Linux-Release/にlibsoundio.a, libsoundio.so, libsoundio.so.2があります
+
+#### (2) 手動ビルド
+- 任意の場所で
+```
+sudo apt-get install cmake curl libunwind8 gettext apt-transport-https libasound2-dev
+git clone https://github.com/andrewrk/libsoundio.git
+cd libsoundio/
+mkdir build && cd build && cmake ..
+make
+```
+- libsoundio.a, libsoundio.so, libsoundio.so.2ができているはず
+
+#### TestTool.Platform
+- bash等で`sh publish-linux-arm.sh`
+- build/linux-arm/にlibsoundio.a, libsoundio.so, libsoundio.so.2をコピー
+- `sh publish-and-sync.sh`
+- ラズパイの`/home/pi/TestTool.Platform`にlinux-arm以下がすべてコピーされる
+- ラズパイのターミナル上で`/home/pi/TestTool.Platform`へ移動して`TestTool.Platform`を実行する
 
 ### カスタムビルドをする場合
 - Visual Studioをインストール
