@@ -4,6 +4,7 @@
         <TargetFrameworks>netstandard2.1;netcoreapp3.0</TargetFrameworks>
         <LangVersion>8</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Platforms>AnyCPU;x64;x86</Platforms>
     </PropertyGroup>
 
 </Project>

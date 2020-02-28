@@ -48,6 +48,7 @@ namespace TestTool.Windows.Panels
 
         private void UpdateFilter()
         {
+            if (lowFreq == null || highFreq == null) return;
             float low = (float)lowFreq.Value;
             float high = (float)highFreq.Value;
 
