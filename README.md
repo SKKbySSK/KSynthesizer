@@ -40,8 +40,8 @@
 - [x] ノコギリ波
 - [x] 三角波
 - [x] ミキサー
-- [ ] LPF
-- [ ] HPF
+- [x] LPF
+- [x] HPF
 - [ ] リバーブ
 - [ ] 全体用のADSR(時間変化に大して音量を変化させる e.g. 減衰していく振動など)
 - [ ] フィルタ用のADSR(時間変化に対してフィルタのカットオフを変化させる)
@@ -51,7 +51,7 @@
 - [ ] PWM出力
 
 ### 追々実装
-- [ ] BPF
+- [x] BPF
 - [ ] コーラス
 - [ ] ディレイ
 
@@ -63,3 +63,7 @@
 [実波形とフーリエ変換](http://www.fbs.osaka-u.ac.jp/labs/ishijima/FFT-05.html)
 
 [ADSR Envelope](https://www.wikiaudio.org/adsr-envelope/)
+
+[BiQuadFilter](https://github.com/naudio/NAudio/blob/master/NAudio/Dsp/BiQuadFilter.cs)
+
+[Cookbook formulae for audio equalizer biquad filter coefficients](https://www.w3.org/2011/audio/audio-eq-cookbook.html)
