@@ -48,6 +48,7 @@ namespace TestTool.Platform
 	        }
 	        else
 	        {
+		        outstream.Dispose();
 		        throw new Exception("No suitable format");
 	        }
 
@@ -69,6 +70,8 @@ namespace TestTool.Platform
 		public double WriteLatency { get; set; } = 0.001f;
 		
 		public List<SoundIODevice> Devices { get; } = new List<SoundIODevice>();
+
+		public int DefaultDeviceIndex => api.DefaultOutputDeviceIndex;
 
 		public void Start()
 		{

@@ -34,7 +34,14 @@ namespace TestTool.Platform
 
             foreach (var (i, dev) in Player.Devices.Select((dev, i) => (i, dev)))
             {
-                Console.WriteLine($"[{i}] {dev.Name}");
+                if (i == Player.DefaultDeviceIndex)
+                {
+                    Console.WriteLine($"[{i}][Default] {dev.Name}");
+                }
+                else
+                {
+                    Console.WriteLine($"[{i}] {dev.Name}");
+                }
             }
 
             SoundIODevice device = null;
