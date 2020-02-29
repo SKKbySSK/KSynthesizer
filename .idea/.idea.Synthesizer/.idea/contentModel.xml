@@ -5,6 +5,7 @@
       <e p="KSynthesizer" t="IncludeRecursive">
         <e p="AudioFormat.cs" t="Include" />
         <e p="BufferSink.cs" t="Include" />
+        <e p="EnvelopeGenerator.cs" t="Include" />
         <e p="Filters" t="Include">
           <e p="AudioFilterBase.cs" t="Include" />
           <e p="BiQuadFilter.cs" t="Include" />
@@ -40,10 +41,30 @@
           </e>
         </e>
       </e>
+      <e p="KSynthesizer.Linux" t="IncludeRecursive">
+        <e p="ISynthesizerInput.cs" t="Include" />
+        <e p="InputEventEnum" t="Include">
+          <e p="InputAbsoluteCodes.cs" t="Include" />
+          <e p="InputKeyCodes.cs" t="Include" />
+          <e p="InputMouseButtonCodes.cs" t="Include" />
+          <e p="InputRelativeCodes.cs" t="Include" />
+          <e p="InputType.cs" t="Include" />
+        </e>
+        <e p="KSynthesizer.Linux.csproj" t="IncludeRecursive" />
+        <e p="KeyboardInput.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netstandard2.1" t="Include">
+              <e p="KSynthesizer.Linux.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+      </e>
       <e p="Synthesizer.sln" t="IncludeFlat" />
       <e p="TestTool.Platform" t="IncludeRecursive">
         <e p=".gitignore" t="Include" />
-        <e p="FunctionPlayer.cs" t="Include" />
+        <e p="AudioPlayer.cs" t="Include" />
         <e p="Program.cs" t="Include" />
         <e p="TestTool.Platform.csproj" t="IncludeRecursive" />
         <e p="bin" t="ExcludeRecursive" />

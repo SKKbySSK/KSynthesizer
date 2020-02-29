@@ -7,7 +7,7 @@ namespace KSynthesizer.Sources
     /// 周期関数ソース用のベースクラス
     /// 1周期分のオーディオデータを保管するため、周波数を変更しても1周期が終わるまでは前の周波数を提供する
     /// </summary>
-    public abstract class PeriodicSourceBase : FunctionalAudioSourceBase
+    public abstract class PeriodicSourceBase : FunctionalAudioSourceBase, IAudioPeriodicSource
     {
         /// <summary>
         /// Period in millisecond
@@ -68,6 +68,11 @@ namespace KSynthesizer.Sources
             Position += (double)size / Format.SampleRate;
 
             return buffer;
+        }
+
+        public void Reset()
+        {
+            LeftOvers.Clear();
         }
 
         /// <summary>

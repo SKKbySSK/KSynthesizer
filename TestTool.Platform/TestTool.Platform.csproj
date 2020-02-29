@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\KSynthesizer.Linux\KSynthesizer.Linux.csproj" />
     <ProjectReference Include="..\KSynthesizer\KSynthesizer.csproj" />
   </ItemGroup>
 

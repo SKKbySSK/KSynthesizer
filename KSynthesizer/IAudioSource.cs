@@ -6,4 +6,11 @@ namespace KSynthesizer
         
         float[] Next(int size);
     }
+
+    public interface IAudioPeriodicSource : IAudioSource
+    {
+        float Period { get; }
+        
+        void Reset();
+    }
 }

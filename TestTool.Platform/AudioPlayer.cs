@@ -4,25 +4,35 @@ using System.Text;
 using SoundIOSharp;
 using KSynthesizer.Sources;
 using System.Diagnostics;
+using System.Linq;
+using KSynthesizer;
 
 namespace TestTool.Platform
 {
-    class FunctionPlayer
+    class AudioPlayer
     {
         SoundIO api = new SoundIO();
 		SoundIOOutStream outstream;
 
-        public FunctionPlayer()
+        public AudioPlayer(IAudioSource source)
         {
+	        Source = source;
             api.Connect();
             api.FlushEvents();
 
-            OutputDevice = api.GetOutputDevice(api.DefaultOutputDeviceIndex);
+            for (int i = 0; api.OutputDeviceCount > i; i++)
+            {
+	            Console.WriteLine($"[{i}]\t{api.GetOutputDevice(i)?.Name}");
+            }
+
+            OutputDevice = api.GetOutputDevice(2);
 
             if (OutputDevice.ProbeError != 0)
             {
                 throw new Exception($"Probe Error : {OutputDevice.ProbeError}");
             }
+            
+            Console.WriteLine($"Device Name : {OutputDevice.Name}");
 
 			outstream = OutputDevice.CreateOutStream();
 			outstream.WriteCallback = (min, max) => write_callback(outstream, min, max);
@@ -38,17 +48,31 @@ namespace TestTool.Platform
 			{
                 throw new Exception("No suitable format");
 			}
+			foreach (var layout in OutputDevice.Layouts)
+			{
+				if (layout.ChannelCount <= 2)
+				{
+					outstream.Layout = layout;
+					break;
+				}
+			}
 
+			api.FlushEvents();
 			outstream.Open();
-		}
+
+			if (outstream.LayoutErrorMessage != null)
+			{
+				throw new Exception("Layout Error : " + outstream.LayoutErrorMessage);
+			}
+        }
 
         public SoundIOBackend Backend => api.CurrentBackend;
 
         public SoundIODevice OutputDevice { get; }
 
-		public PeriodicFunctionsSource Source { get; } = new PeriodicFunctionsSource(44100);
+		public IAudioSource Source { get; }
 
-		public double WriteLatency { get; set; } = 0.05f;
+		public double WriteLatency { get; set; } = 0.001f;
 
 		public void Start()
 		{
@@ -100,7 +124,7 @@ namespace TestTool.Platform
 		static int underflow_callback_count = 0;
 		static void underflow_callback(SoundIOOutStream outstream)
 		{
-			Console.Error.WriteLine("underflow {0}", underflow_callback_count++);
+			//Console.Error.WriteLine("underflow {0}", underflow_callback_count++);
 		}
 	}
 }
