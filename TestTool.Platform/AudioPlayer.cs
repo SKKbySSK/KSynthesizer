@@ -50,21 +50,13 @@ namespace TestTool.Platform
 	        {
 		        throw new Exception("No suitable format");
 	        }
-	        foreach (var layout in OutputDevice.Layouts)
-	        {
-		        if (layout.ChannelCount <= 2)
-		        {
-			        outstream.Layout = layout;
-			        break;
-		        }
-	        }
 
 	        api.FlushEvents();
 	        outstream.Open();
 
 	        if (outstream.LayoutErrorMessage != null)
 	        {
-		        throw new Exception("Layout Error : " + outstream.LayoutErrorMessage);
+		        Console.WriteLine("Layout Error : " + outstream.LayoutErrorMessage);
 	        }
         }
 
@@ -87,7 +79,7 @@ namespace TestTool.Platform
 		public void Dispose()
 		{
 			outstream.Dispose();
-			OutputDevice.RemoveReference();
+			OutputDevice?.RemoveReference();
 			api.Dispose();
 		}
 
