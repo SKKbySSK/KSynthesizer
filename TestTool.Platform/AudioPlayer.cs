@@ -22,57 +22,61 @@ namespace TestTool.Platform
 
             for (int i = 0; api.OutputDeviceCount > i; i++)
             {
-	            Console.WriteLine($"[{i}]\t{api.GetOutputDevice(i)?.Name}");
+	            Devices.Add(api.GetOutputDevice(i));
             }
+        }
 
-            OutputDevice = api.GetOutputDevice(2);
-
-            if (OutputDevice.ProbeError != 0)
-            {
-                throw new Exception($"Probe Error : {OutputDevice.ProbeError}");
-            }
+        public void Init(SoundIODevice device)
+        {
+	        OutputDevice = device;
+	        if (OutputDevice.ProbeError != 0)
+	        {
+		        throw new Exception($"Probe Error : {OutputDevice.ProbeError}");
+	        }
             
-            Console.WriteLine($"Device Name : {OutputDevice.Name}");
+	        Console.WriteLine($"Device Name : {OutputDevice.Name}");
 
-			outstream = OutputDevice.CreateOutStream();
-			outstream.WriteCallback = (min, max) => write_callback(outstream, min, max);
-			outstream.UnderflowCallback = () => underflow_callback(outstream);
-			outstream.SoftwareLatency = 0;
-			outstream.SampleRate = Source.Format.SampleRate;
+	        outstream = OutputDevice.CreateOutStream();
+	        outstream.WriteCallback = (min, max) => write_callback(outstream, min, max);
+	        outstream.UnderflowCallback = () => underflow_callback(outstream);
+	        outstream.SoftwareLatency = 0;
+	        outstream.SampleRate = Source.Format.SampleRate;
 
-			if (OutputDevice.SupportsFormat(SoundIODevice.Float32NE))
-			{
-				outstream.Format = SoundIODevice.Float32NE;
-			}
-			else
-			{
-                throw new Exception("No suitable format");
-			}
-			foreach (var layout in OutputDevice.Layouts)
-			{
-				if (layout.ChannelCount <= 2)
-				{
-					outstream.Layout = layout;
-					break;
-				}
-			}
+	        if (OutputDevice.SupportsFormat(SoundIODevice.Float32NE))
+	        {
+		        outstream.Format = SoundIODevice.Float32NE;
+	        }
+	        else
+	        {
+		        throw new Exception("No suitable format");
+	        }
+	        foreach (var layout in OutputDevice.Layouts)
+	        {
+		        if (layout.ChannelCount <= 2)
+		        {
+			        outstream.Layout = layout;
+			        break;
+		        }
+	        }
 
-			api.FlushEvents();
-			outstream.Open();
+	        api.FlushEvents();
+	        outstream.Open();
 
-			if (outstream.LayoutErrorMessage != null)
-			{
-				throw new Exception("Layout Error : " + outstream.LayoutErrorMessage);
-			}
+	        if (outstream.LayoutErrorMessage != null)
+	        {
+		        throw new Exception("Layout Error : " + outstream.LayoutErrorMessage);
+	        }
         }
 
         public SoundIOBackend Backend => api.CurrentBackend;
 
-        public SoundIODevice OutputDevice { get; }
+        public SoundIODevice OutputDevice { get; private set; }
 
 		public IAudioSource Source { get; }
 
 		public double WriteLatency { get; set; } = 0.001f;
+		
+		public List<SoundIODevice> Devices { get; } = new List<SoundIODevice>();
 
 		public void Start()
 		{

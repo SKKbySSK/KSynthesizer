@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using KSynthesizer;
 using KSynthesizer.Linux;
 using KSynthesizer.Linux.InputEventEnum;
 using KSynthesizer.Sources;
+using SoundIOSharp;
 
 namespace TestTool.Platform
 {
@@ -29,7 +31,24 @@ namespace TestTool.Platform
             Source.SetFrequency(400);
             EnvelopeGenerator = new EnvelopeGenerator(Source);
             Player = new AudioPlayer(EnvelopeGenerator);
+
+            foreach (var (i, dev) in Player.Devices.Select((dev, i) => (i, dev)))
+            {
+                Console.WriteLine($"[{i}] {dev.Name}");
+            }
+
+            SoundIODevice device = null;
+            while (device == null)
+            {
+                var num = Console.ReadLine();
+                if (int.TryParse(num, out var i) && i >= 0 && i < Player.Devices.Count)
+                {
+                    device = Player.Devices[i];
+                    break;
+                }
+            }
             
+            Player.Init(device);
             KeyboardInput.Listen();
             Player.Start();
             while (true)
