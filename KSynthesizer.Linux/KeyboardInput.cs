@@ -7,40 +7,6 @@ using KSynthesizer.Linux.InputEventEnum;
 
 namespace KSynthesizer.Linux
 {
-    [StructLayout(LayoutKind.Sequential)]
-    struct NativeTimeval
-    {
-        public long tv_sec;
-        public long tv_usec;
-    }
-	
-    [StructLayout(LayoutKind.Sequential)]
-    struct NativeInputEvent
-    {
-        public NativeTimeval Time;
-        public ushort Type;
-        public ushort Code;
-        public int Value;
-    }
-
-    public struct InputEvent
-    {
-        internal InputEvent(NativeInputEvent native)
-        {            
-            var dtDateTime = new DateTime(1970,1,1,0,0,0,0,System.DateTimeKind.Utc);
-            Time = dtDateTime.AddSeconds(native.Time.tv_sec).ToLocalTime();
-            Type = (InputType) native.Type;
-            Code = native.Code;
-            Value = native.Value;
-        }
-        
-        public DateTime Time;
-        public InputType Type;
-        public ushort Code;
-        public int Value;
-    }
-
-    
     public class KeyboardInput : ISynthesizerInput<InputKeyCodes>
     {
 
@@ -57,13 +23,16 @@ namespace KSynthesizer.Linux
         private bool listening = false;
 
         public event EventHandler<InputEventArgs<InputKeyCodes>> Attack;
+        
         public event EventHandler<InputEventArgs<InputKeyCodes>> Release;
 
         public List<InputKeyCodes> Keys { get; } = new List<InputKeyCodes>();
         
+        public Action<Exception> ErrorHandler { get; set; }
+        
         public string Keyboard { get; }
 
-        public void Listen()
+        public unsafe void Listen()
         {
             if (listening)
             {
@@ -78,7 +47,7 @@ namespace KSynthesizer.Linux
                 {
                     using (var stream = new FileStream(Keyboard, FileMode.Open, FileAccess.Read))
                     {
-                        byte[] buffer = new byte[24];
+                        byte[] buffer = new byte[Environment.Is64BitProcess ? sizeof(NativeInputEvent64) : sizeof(NativeInputEvent32)];
                         while (listening)
                         {
                             stream.Read(buffer, 0, buffer.Length);
@@ -88,9 +57,12 @@ namespace KSynthesizer.Linux
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    throw new InputException("Program must be executed by super user", ex);
+                    ErrorHandler?.Invoke(new InputException("Program must be executed by super user", ex));
                 }
-
+                catch (Exception ex)
+                {
+                    ErrorHandler?.Invoke(new InputException("Unknown Error Occured", ex));
+                }
                 listening = false;
             });
         }
@@ -99,8 +71,16 @@ namespace KSynthesizer.Linux
         {
             fixed (byte* ptr = buffer)
             {
-                var ev = (NativeInputEvent)Marshal.PtrToStructure((IntPtr)ptr, typeof(NativeInputEvent));
-                return new InputEvent(ev);
+                if (Environment.Is64BitProcess)
+                {
+                    var ev = (NativeInputEvent64)Marshal.PtrToStructure((IntPtr)ptr, typeof(NativeInputEvent64));
+                    return new InputEvent(ev);
+                }
+                else
+                {
+                    var ev = (NativeInputEvent32)Marshal.PtrToStructure((IntPtr)ptr, typeof(NativeInputEvent32));
+                    return new InputEvent(ev);
+                }
             }
         }
         

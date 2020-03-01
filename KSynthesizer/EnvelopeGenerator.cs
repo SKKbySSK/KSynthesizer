@@ -7,20 +7,20 @@ namespace KSynthesizer
     {
         Silent,
         Attack,
-        Decay,
-        Sustain,
         Release,
     }
     
     public class EnvelopeGenerator : IAudioFilter
     {
+        public event EventHandler Released;
+        
         public TimeSpan AttackDuration { get; set; } = TimeSpan.FromMilliseconds(300);
 
         public TimeSpan DecayDuration { get; set; } = TimeSpan.FromMilliseconds(500);
 
         public float SustainVolume { get; set; } = 0.5f;
         
-        public TimeSpan ReleaseDuration { get; set; } = TimeSpan.FromMilliseconds(1200);
+        public TimeSpan ReleaseDuration { get; set; } = TimeSpan.FromMilliseconds(3000);
 
         public EnvelopeState CurrentState { get; private set; } = EnvelopeState.Silent;
         
@@ -31,7 +31,6 @@ namespace KSynthesizer
         public bool CopySource { get; set; } = false;
 
         private TimeSpan ReleaseTime;
-
         private float LastVolume;
         
         public IAudioSource Source { get; }
@@ -71,10 +70,10 @@ namespace KSynthesizer
 
         private bool ApplyRelease(ref float value, double seconds)
         {
-            float mul = (1f - (float) (seconds / ReleaseDuration.TotalSeconds)) * LastVolume;
+            float mul = LastVolume * (1f - (float) (seconds / ReleaseDuration.TotalSeconds));
             value *= mul;
 
-            return seconds >= ReleaseDuration.TotalSeconds;
+            return false;
         }
 
         public EnvelopeGenerator(IAudioSource source)
@@ -120,6 +119,7 @@ namespace KSynthesizer
                         {
                             periodic.Reset();
                         }
+                        //Released?.Invoke(this, EventArgs.Empty);
                     }
                 }
 

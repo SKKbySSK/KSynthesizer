@@ -13,6 +13,8 @@ namespace TestTool.Platform
     {
         SoundIO api = new SoundIO();
 		SoundIOOutStream outstream;
+		private bool firstPlay = true;
+		private bool isPaused = true;
 
         public AudioPlayer(IAudioSource source)
         {
@@ -49,10 +51,9 @@ namespace TestTool.Platform
 	        else
 	        {
 		        outstream.Dispose();
+		        outstream = null;
 		        throw new Exception("No suitable format");
 	        }
-
-	        api.FlushEvents();
 	        outstream.Open();
 
 	        if (outstream.LayoutErrorMessage != null)
@@ -67,21 +68,35 @@ namespace TestTool.Platform
 
 		public IAudioSource Source { get; }
 
-		public double WriteLatency { get; set; } = 0.001f;
+		public double WriteLatency { get; set; } = 0.01f;
 		
 		public List<SoundIODevice> Devices { get; } = new List<SoundIODevice>();
 
 		public int DefaultDeviceIndex => api.DefaultOutputDeviceIndex;
 
-		public void Start()
+		public void Play()
 		{
-			outstream.Start();
-			api.FlushEvents();
+			if (firstPlay)
+			{
+				outstream.Start();
+				firstPlay = false;
+			}
+			else
+			{
+				outstream.ClearBuffer();
+			}
+			
+			isPaused = false;
+		}
+
+		public void Pause()
+		{
+			isPaused = true;
 		}
 
 		public void Dispose()
 		{
-			outstream.Dispose();
+			outstream?.Dispose();
 			OutputDevice?.RemoveReference();
 			api.Dispose();
 		}
@@ -90,7 +105,7 @@ namespace TestTool.Platform
 		{
 			int frames_left = frame_count_min;
 			var writeSize = (int)(Source.Format.SampleRate * WriteLatency);
-
+			
 			int frame_count = Math.Max(frames_left, Math.Min(writeSize, frame_count_max));
 			if (frame_count == 0)
 			{
@@ -100,7 +115,7 @@ namespace TestTool.Platform
 			var results = outstream.BeginWrite(ref frame_count);
 			SoundIOChannelLayout layout = outstream.Layout;
 
-			var buffer = Source.Next(frame_count);
+			var buffer = isPaused ? new float[frame_count] : Source.Next(frame_count);
 			for (int frame = 0; frame < frame_count; frame++)
 			{
 				for (int channel = 0; channel < layout.ChannelCount; channel++)

@@ -4,6 +4,7 @@
     <e p="$PROJECT_DIR$" t="IncludeFlat">
       <e p="KSynthesizer" t="IncludeRecursive">
         <e p="AudioFormat.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
         <e p="BufferSink.cs" t="Include" />
         <e p="EnvelopeGenerator.cs" t="Include" />
         <e p="Filters" t="Include">
@@ -16,6 +17,16 @@
         <e p="IAudioOutput.cs" t="Include" />
         <e p="IAudioSource.cs" t="Include" />
         <e p="KSynthesizer.csproj" t="IncludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.0" t="Include">
+              <e p="KSynthesizer.AssemblyInfo.cs" t="Include" />
+            </e>
+            <e p="netstandard2.1" t="Include">
+              <e p="KSynthesizer.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
         <e p="Sources" t="Include">
           <e p="Abstracts" t="Include">
             <e p="FunctionalAudioSourceBase.cs" t="Include" />
@@ -29,20 +40,10 @@
           <e p="SinSource.cs" t="Include" />
           <e p="TriangleSource.cs" t="Include" />
         </e>
-        <e p="bin" t="ExcludeRecursive" />
-        <e p="obj" t="ExcludeRecursive">
-          <e p="Debug" t="Include">
-            <e p="netcoreapp3.0" t="Include">
-              <e p="KSynthesizer.AssemblyInfo.cs" t="Include" />
-            </e>
-            <e p="netstandard2.1" t="Include">
-              <e p="KSynthesizer.AssemblyInfo.cs" t="Include" />
-            </e>
-          </e>
-        </e>
       </e>
       <e p="KSynthesizer.Linux" t="IncludeRecursive">
-        <e p="ISynthesizerInput.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="InputEvent.cs" t="Include" />
         <e p="InputEventEnum" t="Include">
           <e p="InputAbsoluteCodes.cs" t="Include" />
           <e p="InputKeyCodes.cs" t="Include" />
@@ -50,9 +51,9 @@
           <e p="InputRelativeCodes.cs" t="Include" />
           <e p="InputType.cs" t="Include" />
         </e>
-        <e p="KSynthesizer.Linux.csproj" t="IncludeRecursive" />
+        <e p="ISynthesizerInput.cs" t="Include" />
         <e p="KeyboardInput.cs" t="Include" />
-        <e p="bin" t="ExcludeRecursive" />
+        <e p="KSynthesizer.Linux.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netstandard2.1" t="Include">
@@ -61,16 +62,22 @@
           </e>
         </e>
       </e>
+      <e p="packages" t="ExcludeRecursive" />
       <e p="Synthesizer.sln" t="IncludeFlat" />
       <e p="TestTool.Platform" t="IncludeRecursive">
         <e p=".gitignore" t="Include" />
         <e p="AudioPlayer.cs" t="Include" />
-        <e p="Program.cs" t="Include" />
-        <e p="TestTool.Platform.csproj" t="IncludeRecursive" />
         <e p="bin" t="ExcludeRecursive" />
+        <e p="CommonInput.cs" t="Include" />
         <e p="connect.sh" t="Include" />
+        <e p="IConsoleInput.cs" t="Include" />
         <e p="libsoundio-sharp" t="Include">
           <e p="libsoundio-sharp" t="Include">
+            <e p="libs" t="Include">
+              <e p="libsoundio.dylib" t="Include" />
+              <e p="libsoundio.so" t="Include" />
+            </e>
+            <e p="libsoundio-interop.cs" t="Include" />
             <e p="MarshalExtensions.cs" t="Include" />
             <e p="SoundIO.cs" t="Include" />
             <e p="SoundIOBackend.cs" t="Include" />
@@ -86,13 +93,9 @@
             <e p="SoundIOOutStream.cs" t="Include" />
             <e p="SoundIORingBuffer.cs" t="Include" />
             <e p="SoundIOSampleRateRange.cs" t="Include" />
-            <e p="libs" t="Include">
-              <e p="libsoundio.dylib" t="Include" />
-              <e p="libsoundio.so" t="Include" />
-            </e>
-            <e p="libsoundio-interop.cs" t="Include" />
           </e>
         </e>
+        <e p="LinuxInput.cs" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netcoreapp3.0" t="Include">
@@ -100,12 +103,15 @@
             </e>
           </e>
         </e>
+        <e p="Program.cs" t="Include" />
         <e p="publish-and-sync.sh" t="Include" />
         <e p="publish-linux-arm.sh" t="Include" />
+        <e p="TestTool.Platform.csproj" t="IncludeRecursive" />
       </e>
       <e p="TestTool.Windows" t="IncludeRecursive">
         <e p="App.xaml" t="Include" />
         <e p="App.xaml.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
         <e p="DurationDialog.xaml" t="Include" />
         <e p="DurationDialog.xaml.cs" t="Include" />
         <e p="FrequencyDialog.xaml" t="Include" />
@@ -114,6 +120,13 @@
         <e p="LastRecordFilter.cs" t="Include" />
         <e p="MainWindow.xaml" t="Include" />
         <e p="MainWindow.xaml.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="TestTool.Windows.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
         <e p="Panels" t="Include">
           <e p="FilterPanel.xaml" t="Include" />
           <e p="FilterPanel.xaml.cs" t="Include" />
@@ -133,12 +146,9 @@
           <e p="WaveView.xaml" t="Include" />
           <e p="WaveView.xaml.cs" t="Include" />
         </e>
-        <e p="bin" t="ExcludeRecursive" />
-        <e p="obj" t="ExcludeRecursive" />
       </e>
-      <e p="packages" t="ExcludeRecursive" />
     </e>
-    <e p="$USER_HOME$/.Rider2019.3/system/extResources" t="IncludeRecursive" />
-    <e p="$USER_HOME$/.Rider2019.3/system/resharper-host/local/Transient/ReSharperHost/v193/SolutionCaches/_Synthesizer.388573732.00" t="ExcludeRecursive" />
+    <e p="$USER_HOME$/Library/Caches/Rider2019.2/extResources" t="IncludeRecursive" />
+    <e p="$USER_HOME$/Library/Caches/Rider2019.2/resharper-host/local/Transient/ReSharperHost/v192/SolutionCaches/_Synthesizer.622606163.00" t="ExcludeRecursive" />
   </component>
 </project>

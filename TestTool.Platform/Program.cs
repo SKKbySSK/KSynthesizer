@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using KSynthesizer;
 using KSynthesizer.Linux;
 using KSynthesizer.Linux.InputEventEnum;
@@ -12,24 +13,22 @@ namespace TestTool.Platform
 {
     class Program
     {
-        private static KeyboardInput KeyboardInput { get; } = new KeyboardInput(KeyboardInput.Keyboards[0]);
-
         private static EnvelopeGenerator EnvelopeGenerator;
         
         private static PeriodicFunctionsSource Source { get; } = new PeriodicFunctionsSource(44100);
 
         private static AudioPlayer Player;
-        
-        static unsafe void Main(string[] args)
-        {
-            KeyboardInput.Keys.Add(InputKeyCodes.KEY_0);
-            KeyboardInput.Keys.Add(InputKeyCodes.KEY_1);
-            KeyboardInput.Attack += KeyboardInputOnAttack;
-            KeyboardInput.Release += KeyboardInputOnRelease;
 
+        private static IConsoleInput Input;
+
+        private static bool exit = false;
+        
+        static void Main(string[] args)
+        {
+            
             Source.Function = FunctionType.Sin;
-            Source.SetFrequency(400);
             EnvelopeGenerator = new EnvelopeGenerator(Source);
+            EnvelopeGenerator.Released += EnvelopeGeneratorOnReleased;
             Player = new AudioPlayer(EnvelopeGenerator);
 
             foreach (var (i, dev) in Player.Devices.Select((dev, i) => (i, dev)))
@@ -47,6 +46,7 @@ namespace TestTool.Platform
             SoundIODevice device = null;
             while (device == null)
             {
+                Console.Write("Device Index > ");
                 var num = Console.ReadLine();
                 if (int.TryParse(num, out var i) && i >= 0 && i < Player.Devices.Count)
                 {
@@ -54,29 +54,62 @@ namespace TestTool.Platform
                     break;
                 }
             }
-            
-            Player.Init(device);
-            KeyboardInput.Listen();
-            Player.Start();
-            while (true)
+
+            try
             {
-                var c = (char)Console.Read();
-                if (c == 'q')
-                {
-                    break;
-                }
+                Player.Init(device);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                Player.Dispose();
+                return;
+            }
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Input = new LinuxInput();
+            }
+            else
+            {
+                Input = new CommonInput();
+            }
+            
+            Input.Attack += InputOnAttack;
+            Input.Release += InputOnRelease;
+            Input.Exit += InputOnExit;
+            Input.Listen();
+
+            while (!exit)
+            {
+                Thread.Sleep(100);
             }
             Player.Dispose();
-		}
+            Input.Stop();
+        }
 
-        private static void KeyboardInputOnRelease(object? sender, InputEventArgs<InputKeyCodes> e)
+        private static void InputOnExit(object sender, EventArgs e)
         {
+            exit = true;
+        }
+
+        private static void InputOnRelease(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Release");
             EnvelopeGenerator.Release();
         }
 
-        private static void KeyboardInputOnAttack(object? sender, InputEventArgs<InputKeyCodes> e)
+        private static void InputOnAttack(object sender, InputEventArgs e)
         {
+            Console.WriteLine($"Attack : {e.Frequency}Hz");
+            Source.SetFrequency(e.Frequency);
             EnvelopeGenerator.Attack();
+            Player.Play();
+        }
+
+        private static void EnvelopeGeneratorOnReleased(object sender, EventArgs e)
+        {
+            Player.Pause();
         }
     }
 }
