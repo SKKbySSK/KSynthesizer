@@ -74,6 +74,31 @@
           </e>
         </e>
         <e p="SoundioOutput.cs" t="Include" />
+        <e p="submodule" t="Include">
+          <e p=".git" t="Include" />
+          <e p="libsoundio-sharp" t="Include">
+            <e p="libs" t="Include">
+              <e p="libsoundio.dylib" t="Include" />
+              <e p="libsoundio.so" t="Include" />
+            </e>
+            <e p="libsoundio-interop.cs" t="Include" />
+            <e p="MarshalExtensions.cs" t="Include" />
+            <e p="SoundIO.cs" t="Include" />
+            <e p="SoundIOBackend.cs" t="Include" />
+            <e p="SoundIOChannelArea.cs" t="Include" />
+            <e p="SoundIOChannelAreas.cs" t="Include" />
+            <e p="SoundIOChannelId.cs" t="Include" />
+            <e p="SoundIOChannelLayout.cs" t="Include" />
+            <e p="SoundIODevice.cs" t="Include" />
+            <e p="SoundIODeviceAim.cs" t="Include" />
+            <e p="SoundIOException.cs" t="Include" />
+            <e p="SoundIOFormat.cs" t="Include" />
+            <e p="SoundIOInStream.cs" t="Include" />
+            <e p="SoundIOOutStream.cs" t="Include" />
+            <e p="SoundIORingBuffer.cs" t="Include" />
+            <e p="SoundIOSampleRateRange.cs" t="Include" />
+          </e>
+        </e>
       </e>
       <e p="packages" t="ExcludeRecursive" />
       <e p="Synthesizer.sln" t="IncludeFlat" />

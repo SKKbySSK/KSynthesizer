@@ -4,3 +4,6 @@
 [submodule "KSynthesizer.Soundio/soundio-sharp"]
 	path = KSynthesizer.Soundio/soundio-sharp
 	url = https://github.com/atsushieno/libsoundio-sharp.git
+[submodule "KSynthesizer.Soundio/submodule"]
+	path = KSynthesizer.Soundio/submodule
+	url = https://github.com/atsushieno/libsoundio-sharp.git

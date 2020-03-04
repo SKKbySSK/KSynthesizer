@@ -4,7 +4,35 @@
         <TargetFramework>netstandard2.1</TargetFramework>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\KSynthesizer\KSynthesizer.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="submodule\libsoundio-sharp.Tests\**" />
+      <Compile Remove="submodule\example\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="submodule\libsoundio-sharp.Tests\**" />
+      <EmbeddedResource Remove="submodule\example\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="submodule\libsoundio-sharp.Tests\**" />
+      <None Remove="submodule\.gitignore" />
+      <None Remove="submodule\.gitmodules" />
+      <None Remove="submodule\LICENSE" />
+      <None Remove="submodule\Makefile" />
+      <None Remove="submodule\README.md" />
+      <None Remove="submodule\example\**" />
     </ItemGroup>
 </Project>

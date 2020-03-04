@@ -27,21 +27,69 @@ namespace KSynthesizer
                 
                 mixer.Sources.Add(envelope);
             }
+
+            FrequencyFilter = new FrequencyFilter(mixer);
         }
+
+        public TimeSpan AttackDuration
+        {
+            get => oscEnvelopes[0].AttackDuration;
+            set
+            {
+                foreach (var env in oscEnvelopes)
+                {
+                    env.AttackDuration = value;
+                }
+            }
+        }
+
+        public TimeSpan DecayDuration
+        {
+            get => oscEnvelopes[0].DecayDuration;
+            set
+            {
+                foreach (var env in oscEnvelopes)
+                {
+                    env.DecayDuration = value;
+                }
+            }
+        }
+
+        public float SustainVolume
+        {
+            get => oscEnvelopes[0].SustainVolume;
+            set
+            {
+                foreach (var env in oscEnvelopes)
+                {
+                    env.SustainVolume = value;
+                }
+            }
+        }
+        
+        public TimeSpan ReleaseDuration
+        {
+            get => oscEnvelopes[0].ReleaseDuration;
+            set
+            {
+                foreach (var env in oscEnvelopes)
+                {
+                    env.ReleaseDuration = value;
+                }
+            }
+        }
+        
+        public FrequencyFilter FrequencyFilter { get; }
 
         public IReadOnlyList<PeriodicFunctionsSource> Oscillators => oscillators;
 
         public IAudioOutput Output { get; }
 
-        public TimeSpan MinimumLatency { get; set; } = TimeSpan.FromMilliseconds(10);
-
         private void OutputOnFillBuffer(object sender, FillBufferEventArgs e)
         {
-            double desiredSize = MinimumLatency.TotalSeconds * e.Format.SampleRate * e.Format.Channels;
-            int length = (int)Math.Min(e.MinimumSize, desiredSize);
-            int channelLen = length / e.Format.Channels;
-            var channelBuffer = mixer.Next(channelLen);
-            var buffer = new float[length];
+            int channelLen = e.Size / e.Format.Channels;
+            var channelBuffer = FrequencyFilter.Next(channelLen);
+            var buffer = new float[e.Size];
 
             for (int i = 0; e.Format.Channels > i; i++)
             {
@@ -49,6 +97,20 @@ namespace KSynthesizer
             }
             
             e.Configure(buffer);
+        }
+
+        public void Attack(int index, float frequency)
+        {
+            var osc = oscillators[index];
+            osc.SetFrequency(frequency);
+            osc.Reset();
+            
+            oscEnvelopes[index].Attack();
+        }
+
+        public void Release(int index)
+        {
+            oscEnvelopes[index].Release();
         }
 
         public void Dispose()
