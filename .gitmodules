@@ -1,3 +1,6 @@
 [submodule "TestTool.Platform/libsoundio-sharp"]
 	path = TestTool.Platform/libsoundio-sharp
 	url = https://github.com/atsushieno/libsoundio-sharp.git
+[submodule "KSynthesizer.Soundio/soundio-sharp"]
+	path = KSynthesizer.Soundio/soundio-sharp
+	url = https://github.com/atsushieno/libsoundio-sharp.git

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTool.Platform", "TestTo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSynthesizer.Linux", "KSynthesizer.Linux\KSynthesizer.Linux.csproj", "{D32809B4-29CD-4E24-8994-90F0BE5E8893}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSynthesizer.Soundio", "KSynthesizer.Soundio\KSynthesizer.Soundio.csproj", "{ACF681DD-7915-4AEF-9125-9C806A3FCC93}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,18 @@ Global
 		{D32809B4-29CD-4E24-8994-90F0BE5E8893}.Release|x64.Build.0 = Release|Any CPU
 		{D32809B4-29CD-4E24-8994-90F0BE5E8893}.Release|x86.ActiveCfg = Release|Any CPU
 		{D32809B4-29CD-4E24-8994-90F0BE5E8893}.Release|x86.Build.0 = Release|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Debug|x64.Build.0 = Debug|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Debug|x86.Build.0 = Debug|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Release|x64.ActiveCfg = Release|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Release|x64.Build.0 = Release|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Release|x86.ActiveCfg = Release|Any CPU
+		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
