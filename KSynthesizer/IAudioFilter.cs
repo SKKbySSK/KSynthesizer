@@ -4,7 +4,7 @@ using System.Text;
 
 namespace KSynthesizer
 {
-    interface IAudioFilter : IAudioSource
+    public interface IAudioFilter : IAudioSource
     {
         bool CopySource { get; set; }
 

@@ -13,7 +13,7 @@ namespace TestTool.Platform
 {
     class Program
     {
-        private static EnvelopeGenerator EnvelopeGenerator;
+        private static VolumeEnvelope EnvelopeGenerator;
         
         private static PeriodicFunctionsSource Source { get; } = new PeriodicFunctionsSource(44100);
 
@@ -27,7 +27,7 @@ namespace TestTool.Platform
         {
             
             Source.Function = FunctionType.Sin;
-            EnvelopeGenerator = new EnvelopeGenerator(Source);
+            EnvelopeGenerator = new VolumeEnvelope(Source);
             EnvelopeGenerator.Released += EnvelopeGeneratorOnReleased;
             Player = new AudioPlayer(EnvelopeGenerator);
 

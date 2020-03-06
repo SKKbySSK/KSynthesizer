@@ -2,30 +2,61 @@ using System;
 using System.Collections.Generic;
 using KSynthesizer.Filters;
 using KSynthesizer.Sources;
+using KSynthesizer.Envelopes;
 
 namespace KSynthesizer
 {
+    public class OscillatorConfiguration
+    {
+        public FunctionType Function { get; set; } = FunctionType.Sin;
+
+        public float Frequency { get; set; } = 440;
+    }
+
+    class SynthesizerInput
+    {
+        public SynthesizerInput()
+        {
+            Envelope = new VolumeEnvelope(Mixer);
+        }
+
+        public void ConfigureInput(int sampleRate, IEnumerable<OscillatorConfiguration> configurations)
+        {
+            Mixer.Sources.Clear();
+            foreach (var config in configurations)
+            {
+                Mixer.Sources.Add(new PeriodicFunctionsSource(sampleRate)
+                {
+                    Function = config.Function,
+                    Period = 1000 / config.Frequency,
+                });
+            }
+        }
+
+        public MixerFilter Mixer { get; } = new MixerFilter();
+
+        public VolumeEnvelope Envelope { get; }
+    }
+
     public class Synthesizer : IDisposable
     {
-        private readonly List<PeriodicFunctionsSource> oscillators = new List<PeriodicFunctionsSource>();
-        private readonly EnvelopeGenerator[] oscEnvelopes;
+        private readonly SynthesizerInput[] inputs;
         private readonly MixerFilter mixer = new MixerFilter();
+        private readonly object lockObj = new object();
+        private int index;
+        private Action<float[]> interceptor;
         
-        public Synthesizer(IAudioOutput output, int oscillatorCount)
+        public Synthesizer(IAudioOutput output, int inputCount)
         {
             Output = output;
             output.FillBuffer += OutputOnFillBuffer;
 
-            oscEnvelopes = new EnvelopeGenerator[oscillatorCount];
-            for (int i = 0; oscillatorCount > i; i++)
+            inputs = new SynthesizerInput[inputCount];
+            for (int i = 0; inputCount > i; i++)
             {
-                var source = new PeriodicFunctionsSource(output.Format.SampleRate);
-                oscillators.Add(source);
-                
-                var envelope = new EnvelopeGenerator(source);
-                oscEnvelopes[i] = envelope;
-                
-                mixer.Sources.Add(envelope);
+                var input = new SynthesizerInput();
+                inputs[i] = input;
+                mixer.Sources.Add(input.Envelope);
             }
 
             FrequencyFilter = new FrequencyFilter(mixer);
@@ -33,90 +64,117 @@ namespace KSynthesizer
 
         public TimeSpan AttackDuration
         {
-            get => oscEnvelopes[0].AttackDuration;
+            get => inputs[0].Envelope.AttackDuration;
             set
             {
-                foreach (var env in oscEnvelopes)
+                foreach (var env in inputs)
                 {
-                    env.AttackDuration = value;
+                    env.Envelope.AttackDuration = value;
                 }
             }
         }
 
         public TimeSpan DecayDuration
         {
-            get => oscEnvelopes[0].DecayDuration;
+            get => inputs[0].Envelope.DecayDuration;
             set
             {
-                foreach (var env in oscEnvelopes)
+                foreach (var env in inputs)
                 {
-                    env.DecayDuration = value;
+                    env.Envelope.DecayDuration = value;
                 }
             }
         }
 
         public float SustainVolume
         {
-            get => oscEnvelopes[0].SustainVolume;
+            get => inputs[0].Envelope.Sustain;
             set
             {
-                foreach (var env in oscEnvelopes)
+                foreach (var env in inputs)
                 {
-                    env.SustainVolume = value;
+                    env.Envelope.Sustain = value;
                 }
             }
         }
         
         public TimeSpan ReleaseDuration
         {
-            get => oscEnvelopes[0].ReleaseDuration;
+            get => inputs[0].Envelope.ReleaseDuration;
             set
             {
-                foreach (var env in oscEnvelopes)
+                foreach (var env in inputs)
                 {
-                    env.ReleaseDuration = value;
+                    env.Envelope.ReleaseDuration = value;
                 }
             }
+        }
+
+        public float MixerVolume
+        {
+            get => mixer.Volume;
+            set => mixer.Volume = value;
         }
         
         public FrequencyFilter FrequencyFilter { get; }
 
-        public IReadOnlyList<PeriodicFunctionsSource> Oscillators => oscillators;
-
         public IAudioOutput Output { get; }
+
+        public void Intercept(Action<float[]> interceptor)
+        {
+            this.interceptor = interceptor;
+        }
 
         private void OutputOnFillBuffer(object sender, FillBufferEventArgs e)
         {
             int channelLen = e.Size / e.Format.Channels;
-            var channelBuffer = FrequencyFilter.Next(channelLen);
-            var buffer = new float[e.Size];
-
-            for (int i = 0; e.Format.Channels > i; i++)
+            lock (lockObj)
             {
-                Array.Copy(channelBuffer, 0, buffer, i * channelLen, channelLen);
+                var channelBuffer = FrequencyFilter.Next(channelLen);
+                var buffer = new float[e.Size];
+
+                for (int i = 0; e.Format.Channels > i; i++)
+                {
+                    Array.Copy(channelBuffer, 0, buffer, i * channelLen, channelLen);
+                }
+
+                interceptor?.Invoke(buffer);
+                e.Configure(buffer);
             }
-            
-            e.Configure(buffer);
         }
 
-        public void Attack(int index, float frequency)
+        public int Attack(IEnumerable<OscillatorConfiguration> configurations)
         {
-            var osc = oscillators[index];
-            osc.SetFrequency(frequency);
-            osc.Reset();
-            
-            oscEnvelopes[index].Attack();
+            var index = NextInput();
+            var input = inputs[index];
+            lock(lockObj)
+            {
+                input.ConfigureInput(Output.Format.SampleRate, configurations);
+            }
+            input.Envelope.Attack();
+            return index;
         }
 
         public void Release(int index)
         {
-            oscEnvelopes[index].Release();
+            inputs[index].Envelope.Release();
+        }
+
+        private int NextInput()
+        {
+            index++;
+            if (index >= inputs.Length)
+            {
+                index = 0;
+            }
+
+            return index;
         }
 
         public void Dispose()
         {
             Output.FillBuffer -= OutputOnFillBuffer;
-            Output.Dispose();
+            interceptor = null;
         }
     }
 }

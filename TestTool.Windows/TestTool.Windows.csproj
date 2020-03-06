@@ -5,9 +5,14 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <UseWPF>true</UseWPF>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Platforms>AnyCPU;x64</Platforms>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <Prefer32Bit>true</Prefer32Bit>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       <Prefer32Bit>true</Prefer32Bit>
     </PropertyGroup>
 
@@ -19,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\KSynthesizer.Soundio\KSynthesizer.Soundio.csproj" />
       <ProjectReference Include="..\KSynthesizer\KSynthesizer.csproj" />
     </ItemGroup>
 

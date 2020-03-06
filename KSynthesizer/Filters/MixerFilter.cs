@@ -18,12 +18,25 @@ namespace KSynthesizer.Filters
         public List<IAudioSource> Sources { get; } = new List<IAudioSource>();
 
         public MixerMode Mode { get; set; } = MixerMode.Average;
+
+        public float TrimVolume { get; set; } = 0.8f;
+
+        public float Volume { get; set; } = 1;
         
         public unsafe virtual float[] Next(int size)
         {
-            var buffer = new float[size];
-            float val;
+            if (Sources.Count == 1 && Mode == MixerMode.Average)
+            {
+                return Sources[0].Next(size);
+            }
 
+            var buffer = new float[size];
+            if (Sources.Count == 0)
+            {
+                return buffer;
+            }
+
+            float val;
             fixed (float* buf = buffer)
             {
                 foreach (var source in Sources)
@@ -33,27 +46,25 @@ namespace KSynthesizer.Filters
                     {
                         fixed (float* srcBuf = sourceBuffer)
                         {
-                            val = buf[i] + srcBuf[i];
-                            switch (Mode)
-                            {
-                                case MixerMode.Trim:
-                                    buf[i] = Math.Min(1, Math.Max(val, -1));
-                                    break;
-                                default:
-                                    buf[i] = val;
-                                    break;
-                            }
+                            buf[i] += srcBuf[i];
                         }
                     }
                 }
 
-                if (Mode == MixerMode.Average)
+                int count = Sources.Count;
+                for (int i = 0; size > i; i++)
                 {
-                    int count = Sources.Count;
-                    for (int i = 0; size > i; i++)
+                    val = buf[i];
+                    switch(Mode)
                     {
-                        buf[i] /= count;
+                        case MixerMode.Average:
+                            val = val * Volume / count;
+                            break;
+                        case MixerMode.Trim:
+                            val = Math.Min(1, Math.Max(-1, val * TrimVolume));
+                            break;
                     }
+                    buf[i] = val;
                 }
             }
 

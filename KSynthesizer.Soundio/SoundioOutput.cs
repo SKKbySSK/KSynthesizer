@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SoundIOSharp;
 
 namespace KSynthesizer.Soundio
@@ -6,7 +7,6 @@ namespace KSynthesizer.Soundio
     public class SoundioOutput : IAudioOutput
     {
         private readonly SoundIO api = new SoundIO();
-        private readonly SoundIODevice[] devices;
         private SoundIOOutStream outstream;
 
         public SoundioOutput()
@@ -14,10 +14,18 @@ namespace KSynthesizer.Soundio
             api.Connect();
             api.FlushEvents();
             
-            devices = new SoundIODevice[api.OutputDeviceCount];
             for (int i = 0; api.OutputDeviceCount > i; i++)
             {
-                devices[i] = api.GetOutputDevice(i);
+                var device = api.GetOutputDevice(i);
+                if (device.SupportsFormat(SoundIODevice.Float32NE))
+                {
+                    if (i == api.DefaultOutputDeviceIndex)
+                    {
+                        DefaultDevice = device;
+                    }
+
+                    Devices.Add(device);
+                }
             }
         }
         
@@ -28,6 +36,10 @@ namespace KSynthesizer.Soundio
         public TimeSpan Latency { get; set; } = TimeSpan.FromMilliseconds(10);
 
         public SoundIODevice Device { get; private set; }
+
+        public List<SoundIODevice> Devices { get; } = new List<SoundIODevice>();
+
+        public SoundIODevice DefaultDevice { get; }
         
         public AudioFormat Format { get; private set; }
         
@@ -71,6 +83,8 @@ namespace KSynthesizer.Soundio
                 
                 throw new OutputInitializationException($"Channel Layout Error : {outstream.LayoutErrorMessage}");
             }
+
+            outstream.Start();
         }
 
         public void Stop()
@@ -99,6 +113,7 @@ namespace KSynthesizer.Soundio
             
             FillBufferEventArgs fillBuffer = new FillBufferEventArgs(Format, frame_count);
             FillBuffer?.Invoke(this, fillBuffer);
+            bool noBuffer = fillBuffer.Buffer == null;
 
             SoundIOChannelLayout layout = outstream.Layout;
             for (int frame = 0; frame < frame_count; frame++)
@@ -106,7 +121,7 @@ namespace KSynthesizer.Soundio
                 for (int channel = 0; channel < layout.ChannelCount; channel++)
                 {
                     var area = results.GetArea(channel);
-                    write_sample(area.Pointer, fillBuffer.Buffer[frame]);
+                    write_sample(area.Pointer, noBuffer ? 0 : fillBuffer.Buffer[frame]);
                     area.Pointer += area.Step;
                 }
             }
