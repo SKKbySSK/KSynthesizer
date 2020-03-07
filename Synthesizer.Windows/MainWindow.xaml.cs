@@ -1,4 +1,6 @@
 ﻿using HandyControl.Controls;
+using KSynthesizer.Midi;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +44,16 @@ namespace Synthesizer.Windows
         {
             base.OnClosed(e);
             panel.Dispose();
+        }
+
+        private void openMidi_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.Filter = "MIDIファイル|*.midi;*.mid";
+            if (ofd.ShowDialog() ?? false)
+            {
+                panel.SetCustomMidiSource(new MidiPlayer(44100, Melanchall.DryWetMidi.Core.MidiFile.Read(ofd.FileName)));
+            }
         }
     }
 }

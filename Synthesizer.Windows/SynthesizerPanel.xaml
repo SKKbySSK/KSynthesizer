@@ -19,58 +19,13 @@
         <Button x:Name="stopButton" Content="Stop" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Height="30" Width="59" Visibility="Hidden" Click="stopButton_Click"/>
         <ComboBox x:Name="devicesBox" Margin="10,10,74,0" VerticalAlignment="Top"/>
 
-        <local:KeyboardView Grid.Row="1" Margin="10,10,33,10" ToneKeyDown="KeyboardView_KeyDown" ToneKeyUp="KeyboardView_KeyUp"/>
+        <local:KeyboardView x:Name="keyboard" Grid.Row="1" Margin="10,10,33,10" ToneKeyDown="KeyboardView_KeyDown" ToneKeyUp="KeyboardView_KeyUp"/>
         <Slider x:Name="volumeSlider" Grid.Row="1" HorizontalAlignment="Right" Margin="0,10,10,10" Orientation="Vertical" Minimum="0" Maximum="1" Value="1" ValueChanged="volumeSlider_ValueChanged"/>
         <local:WaveView x:Name="waveView" HorizontalAlignment="Right" Margin="0,48,10,10" Width="343"/>
-        <local:FunctionComboBox x:Name="Osc1" HorizontalAlignment="Left" Margin="10,48,0,0" VerticalAlignment="Top" Width="120"/>
-        <local:FunctionComboBox x:Name="Osc2" HorizontalAlignment="Left" Margin="135,48,0,0" VerticalAlignment="Top" Width="120"/>
-
-        <syncfusion:SfRadialSlider Visibility="Hidden" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Bottom" Height="94" Width="100" Value="0" StartAngle="120" EndAngle="420" Minimum="0" Maximum="100" TickFrequency="20" InnerRimStroke="#FF3C3C3C" OuterRimStroke="#FF232323">
-            <syncfusion:SfRadialSlider.PointerStyle>
-                <Style TargetType="syncfusion:RadialPointer" >
-                    <Setter Property="Height" Value="2"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="syncfusion:RadialPointer">
-                                <Border  Background="Black"/>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </syncfusion:SfRadialSlider.PointerStyle>
-        </syncfusion:SfRadialSlider>
-        <hc:ButtonGroup HorizontalAlignment="Left" Margin="10,0,0,101" VerticalAlignment="Bottom" Visibility="Hidden">
-            <RadioButton Content="LPF" Width="70" IsChecked="True"/>
-            <RadioButton Content="HPF" Width="70"/>
-            <RadioButton Content="BPF" Width="70"/>
-        </hc:ButtonGroup>
-        <syncfusion:SfRadialSlider x:Name="semitone1" HorizontalAlignment="Left" Margin="20,0,0,136" VerticalAlignment="Bottom" Height="94" Width="100" Value="0" StartAngle="120" EndAngle="420" Minimum="-12" Maximum="24" TickFrequency="3" InnerRimStroke="#FF3C3C3C" OuterRimStroke="#FF232323">
-            <syncfusion:SfRadialSlider.PointerStyle>
-                <Style TargetType="{x:Type syncfusion:RadialPointer}" >
-                    <Setter Property="Height" Value="2"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type syncfusion:RadialPointer}">
-                                <Border  Background="Black"/>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </syncfusion:SfRadialSlider.PointerStyle>
-        </syncfusion:SfRadialSlider>
-        <syncfusion:SfRadialSlider x:Name="semitone2" HorizontalAlignment="Left" Margin="145,0,0,131" VerticalAlignment="Bottom" Height="94" Width="100" Value="0" StartAngle="120" EndAngle="420" Minimum="-12" Maximum="24" TickFrequency="3" InnerRimStroke="#FF3C3C3C" OuterRimStroke="#FF232323">
-            <syncfusion:SfRadialSlider.PointerStyle>
-                <Style TargetType="{x:Type syncfusion:RadialPointer}" >
-                    <Setter Property="Height" Value="2"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type syncfusion:RadialPointer}">
-                                <Border  Background="Black"/>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </syncfusion:SfRadialSlider.PointerStyle>
-        </syncfusion:SfRadialSlider>
+        <local:FunctionComboBox x:Name="Osc1" HorizontalAlignment="Left" Margin="10,48,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Osc_SelectionChanged"/>
+        <local:FunctionComboBox x:Name="Osc2" HorizontalAlignment="Left" Margin="135,48,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Osc_SelectionChanged"/>
+        <local:Thumb x:Name="semitone1" HorizontalAlignment="Left" Margin="20,0,0,136" VerticalAlignment="Bottom" Height="94" Width="100" Value="0" Minimum="-12" Maximum="24" TickFrequency="3"/>
+        <local:Thumb x:Name="semitone2" HorizontalAlignment="Left" Margin="145,0,0,131" VerticalAlignment="Bottom" Height="94" Width="100" Value="0" Minimum="-12" Maximum="24" TickFrequency="3"/>
+        <local:FrequencyPanel x:Name="freqPanel" HorizontalAlignment="Left" Height="163" Margin="260,48,0,0" VerticalAlignment="Top" Width="182"/>
     </Grid>
 </UserControl>

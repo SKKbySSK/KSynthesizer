@@ -10,6 +10,9 @@
     <Compile Update="FrequencyPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Thumb.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="FrequencyPanel.xaml">
@@ -22,6 +25,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="SynthesizerPanel.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Thumb.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="WaveView.xaml">

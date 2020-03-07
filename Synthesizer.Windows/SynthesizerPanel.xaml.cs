@@ -12,16 +12,57 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using KSynthesizer;
+using KSynthesizer.Midi;
 using KSynthesizer.Soundio;
 
 namespace Synthesizer.Windows
 {
+    class InterceptableSource : IAudioSource
+    {
+        Action<float[]> interceptor;
+
+        public IAudioSource Source { get; set; }
+
+        public AudioFormat Format => Source.Format;
+
+        public void Intercept(Action<float[]> interceptor)
+        {
+            this.interceptor = interceptor;
+        }
+
+        public float[] Next(int size)
+        {
+            var buffer = Source.Next(size);
+            interceptor?.Invoke(buffer);
+            return buffer;
+        }
+    }
+
     /// <summary>
     /// SynthesizerPanel.xaml の相互作用ロジック
     /// </summary>
     public partial class SynthesizerPanel : UserControl
     {
+        private bool isCustomMode = false;
+
         private KSynthesizer.Synthesizer Synthesizer { get; set; }
+
+        private MidiPlayer CustomMidiSource { get; set; }
+
+        private InterceptableSource Interceptable { get; } = new InterceptableSource();
+
+        public bool IsCustomMode
+        {
+            get => isCustomMode;
+            private set
+            {
+                isCustomMode = value;
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    keyboard.IsEnabled = !value;
+                }));
+            }
+        }
 
         private SoundioOutput Output { get; } = new SoundioOutput();
 
@@ -56,6 +97,42 @@ namespace Synthesizer.Windows
 
             Recorder = new BufferRecorder(Format);
             waveView.PlotSource = Recorder;
+
+            Synthesizer = new KSynthesizer.Synthesizer(Format.SampleRate, 8);
+            Interceptable.Source = Synthesizer;
+            Interceptable.Intercept(Interceptor);
+            UpdateSynthesizer();
+        }
+
+        public void SetCustomMidiSource(MidiPlayer source)
+        {
+            if (source == null)
+            {
+                if (Interceptable.Source is MidiPlayer midi)
+                {
+                    midi.Finished -= Source_Finished;
+                }
+
+                Interceptable.Source = Synthesizer;
+                IsCustomMode = false;
+                UpdateSynthesizer();
+                return;
+            }
+            source.OscillatorConfigs.Clear();
+            source.OscillatorConfigs.AddRange(GenerateConfig(0, 0));
+            source.Finished += Source_Finished;
+            CustomMidiSource = source;
+            Interceptable.Source = source;
+            IsCustomMode = true;
+            UpdateSynthesizer();
+        }
+
+        private void Source_Finished(object sender, EventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                SetCustomMidiSource(null);
+            }));
         }
 
         private void prepareButton_Click(object sender, RoutedEventArgs e)
@@ -65,8 +142,7 @@ namespace Synthesizer.Windows
                 try
                 {
                     Output.SetDevice(Output.Devices[devicesBox.SelectedIndex], Format);
-                    Synthesizer = new KSynthesizer.Synthesizer(Output, 8);
-                    Synthesizer.Intercept(Interceptor);
+                    Output.FillBuffer += Output_FillBuffer;
                     Volume = (float)volumeSlider.Value;
 
                     Output.Play();
@@ -75,22 +151,31 @@ namespace Synthesizer.Windows
                     prepareButton.Visibility = Visibility.Hidden;
                     stopButton.Visibility = Visibility.Visible;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     waveView.Pause();
-                    Synthesizer?.Dispose();
-                    Synthesizer = null;
                     MessageBox.Show("内部エラーが発生しました。\n別のデバイスで試してみてください\n\n" + ex.ToString());
                 }
             }
         }
 
+        private void Output_FillBuffer(object sender, FillBufferEventArgs e)
+        {
+            int channelLen = e.Size / e.Format.Channels;
+            var channelBuffer = Interceptable.Next(channelLen);
+            var buffer = new float[e.Size];
+
+            for (int i = 0; e.Format.Channels > i; i++)
+            {
+                Array.Copy(channelBuffer, 0, buffer, i * channelLen, channelLen);
+            }
+
+            e.Configure(buffer);
+        }
+
         private void stopButton_Click(object sender, RoutedEventArgs e)
         {
             waveView.Pause();
-            Synthesizer?.Dispose();
-            Synthesizer = null;
-
             devicesBox.IsEnabled = true;
             stopButton.Visibility = Visibility.Hidden;
             prepareButton.Visibility = Visibility.Visible;
@@ -98,9 +183,9 @@ namespace Synthesizer.Windows
 
         public void Dispose()
         {
+            SetCustomMidiSource(null);
             waveView.Pause();
             Output.Dispose();
-            Synthesizer?.Dispose();
         }
 
         private void KeyboardView_KeyDown(object sender, ValueEventArgs<IonianTone> e)
@@ -124,55 +209,43 @@ namespace Synthesizer.Windows
 
         public void OnPhysicalKeyDown(Key key)
         {
-            if (Synthesizer == null)
-            {
-                return;
-            }
-
-            if (KeyStates.TryGetValue(key, out var pressed) && pressed)
-            {
-                return;
-            }
-
             var tone = GetToneForKey(key, PhysicalKeyOctave);
             if (tone == null) return;
-
-            var index = Synthesizer.Attack(GenerateConfig(tone.Value));
-            OscIndicies[tone.Value] = index;
-            KeyStates[key] = true;
-        }
-
-        private List<OscillatorConfiguration> GenerateConfig(IonianTone tone)
-        {
-            var tone1 = tone;
-            tone1.Semitones = (int)Math.Round(semitone1.Value);
-            var tone2 = tone;
-            tone2.Semitones = (int)Math.Round(semitone2.Value);
-
-            var configurations = new List<OscillatorConfiguration>();
-            configurations.Add(new OscillatorConfiguration()
-            {
-                Function = Osc1.Function,
-                Frequency = Scale.GetFrequency(tone1),
-            });
-
-            configurations.Add(new OscillatorConfiguration()
-            {
-                Function = Osc2.Function,
-                Frequency = Scale.GetFrequency(tone2),
-            });
-            return configurations;
+            keyboard.SimulateKeyDown(tone.Value);
         }
 
         public void OnPhysicalKeyUp(Key key)
         {
             var tone = GetToneForKey(key, PhysicalKeyOctave);
             if (tone == null) return;
-            KeyStates[key] = false;
-            if (OscIndicies.TryGetValue(tone.Value, out var index))
+            keyboard.SimulateKeyUp(tone.Value);
+        }
+
+        private List<OscillatorConfig> GenerateConfig(IonianTone tone)
+        {
+            var tone1 = tone;
+            tone1.Semitones = (int)Math.Round(semitone1.Value);
+            var tone2 = tone;
+            tone2.Semitones = (int)Math.Round(semitone2.Value);
+            return GenerateConfig(Scale.GetFrequency(tone1), Scale.GetFrequency(tone2));
+        }
+
+        private List<OscillatorConfig> GenerateConfig(float freq1, float freq2)
+        {
+            var configurations = new List<OscillatorConfig>();
+            configurations.Add(new OscillatorConfig()
             {
-                Synthesizer?.Release(index);
-            }
+                Function = Osc1.Function,
+                Frequency = freq1,
+            });
+
+            configurations.Add(new OscillatorConfig()
+            {
+                Function = Osc2.Function,
+                Frequency = freq2,
+            });
+
+            return configurations;
         }
 
         private IonianTone? GetToneForKey(Key key, int octave)
@@ -237,6 +310,26 @@ namespace Synthesizer.Windows
         private void volumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Volume = (float)volumeSlider.Value;
+        }
+
+        private void Osc_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CustomMidiSource != null)
+            {
+                CustomMidiSource.OscillatorConfigs[0].Function = Osc1.Function;
+                CustomMidiSource.OscillatorConfigs[1].Function = Osc2.Function;
+            }
+        }
+
+        private void UpdateSynthesizer()
+        {
+            var synthesizer = IsCustomMode ? CustomMidiSource.Synthesizer : Synthesizer;
+
+            synthesizer.AttackDuration = TimeSpan.FromMilliseconds(10);
+            synthesizer.DecayDuration = TimeSpan.FromMilliseconds(4000);
+            synthesizer.Sustain = 0;
+            synthesizer.ReleaseDuration = TimeSpan.FromMilliseconds(4000);
+            freqPanel.Filter = synthesizer.FrequencyFilter;
         }
     }
 }

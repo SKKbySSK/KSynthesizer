@@ -6,7 +6,7 @@ using KSynthesizer.Envelopes;
 
 namespace KSynthesizer
 {
-    public class OscillatorConfiguration
+    public class OscillatorConfig
     {
         public FunctionType Function { get; set; } = FunctionType.Sin;
 
@@ -20,7 +20,7 @@ namespace KSynthesizer
             Envelope = new VolumeEnvelope(Mixer);
         }
 
-        public void ConfigureInput(int sampleRate, IEnumerable<OscillatorConfiguration> configurations)
+        public void ConfigureInput(int sampleRate, IEnumerable<OscillatorConfig> configurations)
         {
             Mixer.Sources.Clear();
             foreach (var config in configurations)
@@ -38,19 +38,16 @@ namespace KSynthesizer
         public VolumeEnvelope Envelope { get; }
     }
 
-    public class Synthesizer : IDisposable
+    public class Synthesizer : IAudioSource
     {
         private readonly SynthesizerInput[] inputs;
         private readonly MixerFilter mixer = new MixerFilter();
         private readonly object lockObj = new object();
         private int index;
-        private Action<float[]> interceptor;
         
-        public Synthesizer(IAudioOutput output, int inputCount)
+        public Synthesizer(int sampleRate, int inputCount)
         {
-            Output = output;
-            output.FillBuffer += OutputOnFillBuffer;
-
+            Format = new AudioFormat(sampleRate, 1, 32);
             inputs = new SynthesizerInput[inputCount];
             for (int i = 0; inputCount > i; i++)
             {
@@ -86,7 +83,7 @@ namespace KSynthesizer
             }
         }
 
-        public float SustainVolume
+        public float Sustain
         {
             get => inputs[0].Envelope.Sustain;
             set
@@ -118,41 +115,28 @@ namespace KSynthesizer
         
         public FrequencyFilter FrequencyFilter { get; }
 
-        public IAudioOutput Output { get; }
+        public AudioFormat Format { get; }
 
-        public void Intercept(Action<float[]> interceptor)
-        {
-            this.interceptor = interceptor;
-        }
-
-        private void OutputOnFillBuffer(object sender, FillBufferEventArgs e)
-        {
-            int channelLen = e.Size / e.Format.Channels;
-            lock (lockObj)
-            {
-                var channelBuffer = FrequencyFilter.Next(channelLen);
-                var buffer = new float[e.Size];
-
-                for (int i = 0; e.Format.Channels > i; i++)
-                {
-                    Array.Copy(channelBuffer, 0, buffer, i * channelLen, channelLen);
-                }
-
-                interceptor?.Invoke(buffer);
-                e.Configure(buffer);
-            }
-        }
-
-        public int Attack(IEnumerable<OscillatorConfiguration> configurations)
+        public int Attack(IEnumerable<OscillatorConfig> configurations)
         {
             var index = NextInput();
             var input = inputs[index];
             lock(lockObj)
             {
-                input.ConfigureInput(Output.Format.SampleRate, configurations);
+                input.ConfigureInput(Format.SampleRate, configurations);
             }
             input.Envelope.Attack();
             return index;
+        }
+
+        public void Attack(IEnumerable<OscillatorConfig> configurations, int index)
+        {
+            var input = inputs[index];
+            lock (lockObj)
+            {
+                input.ConfigureInput(Format.SampleRate, configurations);
+            }
+            input.Envelope.Attack();
         }
 
         public void Release(int index)
@@ -171,10 +155,12 @@ namespace KSynthesizer
             return index;
         }
 
-        public void Dispose()
+        public float[] Next(int size)
         {
-            Output.FillBuffer -= OutputOnFillBuffer;
-            interceptor = null;
+            lock (lockObj)
+            {
+                return FrequencyFilter.Next(size);
+            }
         }
     }
 }

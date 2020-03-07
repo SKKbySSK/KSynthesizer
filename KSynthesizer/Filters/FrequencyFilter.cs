@@ -82,7 +82,7 @@ namespace KSynthesizer.Filters
 
             for (int i = 0; buffer.Length > i; i++)
             {
-                buffer[i] = filter.Transform(buffer[i]);
+                buffer[i] = Math.Min(1, Math.Max(-1, filter.Transform(buffer[i])));
             }
         }
     }

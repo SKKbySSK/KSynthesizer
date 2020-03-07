@@ -17,8 +17,8 @@ namespace KSynthesizer.Envelopes
         {
             float mul = (float) (seconds / AttackDuration.TotalSeconds);
             mul = Algorithm.Attack(mul);
-            lastVolume = Math.Max(mul, SilentLevel);
-            value *= Math.Max(mul, SilentLevel);
+            lastVolume = Math.Max(Math.Max(mul, SilentLevel), lastVolume);
+            value *= Math.Max(Math.Max(mul, SilentLevel), lastVolume);
         }
 
         protected override void ApplyDecay(ref float value, double seconds)

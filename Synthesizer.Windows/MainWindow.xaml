@@ -7,5 +7,16 @@
         xmlns:local="clr-namespace:Synthesizer.Windows"
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="800" ActiveGlowColor="Orange">
-    <local:SynthesizerPanel x:Name="panel"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Menu HorizontalAlignment="Stretch">
+            <MenuItem Header="File">
+                <MenuItem x:Name="openMidi" Header="Open Midi File" Click="openMidi_Click"/>
+            </MenuItem>
+        </Menu>
+        <local:SynthesizerPanel x:Name="panel" Grid.Row="1"/>
+    </Grid>
 </hc:GlowWindow>

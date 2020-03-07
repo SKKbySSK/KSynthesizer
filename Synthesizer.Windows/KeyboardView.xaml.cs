@@ -88,6 +88,7 @@ namespace Synthesizer.Windows
     public partial class KeyboardView : UserControl
     {
         int lastChildrenCount = 0;
+        List<KeyView> visibleKeys = new List<KeyView>();
         public event EventHandler<ValueEventArgs<IonianTone>> ToneKeyDown;
         public event EventHandler<ValueEventArgs<IonianTone>> ToneKeyUp;
 
@@ -115,6 +116,10 @@ namespace Synthesizer.Windows
 
         private void Key_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (!IsEnabled)
+            {
+                return;
+            }
             var view = (KeyView)sender;
             view.OnKeyDown();
             ToneKeyDown?.Invoke(this, new ValueEventArgs<IonianTone>(new IonianTone()
@@ -127,6 +132,10 @@ namespace Synthesizer.Windows
 
         private void Key_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if (!IsEnabled)
+            {
+                return;
+            }
             var view = (KeyView)sender;
             view.OnKeyUp();
             ToneKeyUp?.Invoke(this, new ValueEventArgs<IonianTone>(new IonianTone()
@@ -139,6 +148,10 @@ namespace Synthesizer.Windows
 
         private void Key_MouseEnter(object sender, MouseEventArgs e)
         {
+            if (!IsEnabled)
+            {
+                return;
+            }
             var view = (KeyView)sender;
             if (!view.IsPressed && Mouse.LeftButton == MouseButtonState.Pressed)
             {
@@ -154,6 +167,10 @@ namespace Synthesizer.Windows
 
         private void Key_MouseLeave(object sender, MouseEventArgs e)
         {
+            if (!IsEnabled)
+            {
+                return;
+            }
             var view = (KeyView)sender;
             if (view.IsPressed)
             {
@@ -167,6 +184,44 @@ namespace Synthesizer.Windows
             }
         }
 
+        public void SimulateKeyDown(IonianTone tone)
+        {
+            if (!IsEnabled)
+            {
+                return;
+            }
+            var view = visibleKeys.FirstOrDefault(view => view.Scale == tone.Scale && view.Sharp == tone.Sharp && view.Octave == tone.Octave);
+            if (view != null)
+            {
+                if (view.IsPressed)
+                {
+                    return;
+                }
+                view.OnKeyDown();
+            }
+
+            ToneKeyDown?.Invoke(this, new ValueEventArgs<IonianTone>(tone));
+        }
+
+        public void SimulateKeyUp(IonianTone tone)
+        {
+            if (!IsEnabled)
+            {
+                return;
+            }
+            var view = visibleKeys.FirstOrDefault(view => view.Scale == tone.Scale && view.Sharp == tone.Sharp && view.Octave == tone.Octave);
+            if (view != null)
+            {
+                if (!view.IsPressed)
+                {
+                    return;
+                }
+                view.OnKeyUp();
+            }
+
+            ToneKeyUp?.Invoke(this, new ValueEventArgs<IonianTone>(tone));
+        }
+
         private void RefreshChildren(double width)
         {
             int count = (int)(width / KeyWidth);
@@ -175,6 +230,7 @@ namespace Synthesizer.Windows
                 return;
             }
             lastChildrenCount = count;
+            visibleKeys.Clear();
 
             foreach (KeyView key in grid.Children)
             {
@@ -215,6 +271,7 @@ namespace Synthesizer.Windows
                 Grid.SetColumn(key, col++);
                 grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(KeyWidth) });
                 grid.Children.Add(key);
+                visibleKeys.Add(key);
 
                 sharpGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(KeyWidth - SharpKeyWidth) });
                 sharpCol++;
@@ -230,6 +287,7 @@ namespace Synthesizer.Windows
                         sharp.MouseLeave += Key_MouseLeave;
                         Grid.SetColumn(sharp, sharpCol);
                         sharpGrid.Children.Add(sharp);
+                        visibleKeys.Add(sharp);
                     }
                 }
                 sharpCol++;

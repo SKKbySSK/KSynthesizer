@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KSynthesizer.Linux", "KSynt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KSynthesizer.Soundio", "KSynthesizer.Soundio\KSynthesizer.Soundio.csproj", "{ACF681DD-7915-4AEF-9125-9C806A3FCC93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synthesizer.Windows", "Synthesizer.Windows\Synthesizer.Windows.csproj", "{54CB0B02-A04C-4822-9E18-0B90DEC561C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Synthesizer.Windows", "Synthesizer.Windows\Synthesizer.Windows.csproj", "{54CB0B02-A04C-4822-9E18-0B90DEC561C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSynthesizer.Midi", "KSynthesizer.Midi\KSynthesizer.Midi.csproj", "{2B328FCC-6472-406D-BE79-F4E2B167594E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,6 +98,18 @@ Global
 		{54CB0B02-A04C-4822-9E18-0B90DEC561C0}.Release|x64.Build.0 = Release|Any CPU
 		{54CB0B02-A04C-4822-9E18-0B90DEC561C0}.Release|x86.ActiveCfg = Release|Any CPU
 		{54CB0B02-A04C-4822-9E18-0B90DEC561C0}.Release|x86.Build.0 = Release|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Debug|x64.Build.0 = Debug|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Debug|x86.Build.0 = Debug|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|x64.ActiveCfg = Release|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|x64.Build.0 = Release|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|x86.ActiveCfg = Release|Any CPU
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

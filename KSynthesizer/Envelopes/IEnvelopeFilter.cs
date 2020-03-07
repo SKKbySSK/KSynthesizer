@@ -48,7 +48,7 @@ namespace KSynthesizer.Envelopes
 
         public EnvelopeState CurrentState { get; private set; } = EnvelopeState.Silent;
 
-        public IEnvelopeAlgorithm Algorithm { get; set; } = new LinearEnvelopeAlgorithm();
+        public IEnvelopeAlgorithm Algorithm { get; set; } = new EasingEnvelopeAlgorithm();
 
         public AudioFormat Format => Source.Format;
 
@@ -59,6 +59,9 @@ namespace KSynthesizer.Envelopes
         public void Attack()
         {
             currentTime = TimeSpan.Zero;
+            releaseLastTime = false;
+            releaseTime = TimeSpan.Zero;
+
             CurrentState = EnvelopeState.Attack;
         }
 
@@ -94,42 +97,7 @@ namespace KSynthesizer.Envelopes
             {
                 time = currentTime.TotalSeconds + ((i + 1) * perSec);
                 value = buffer[i];
-
-                if (CurrentState == EnvelopeState.Silent)
-                {
-                    ApplySilent(ref value);
-                }
-                else if (time <= AttackDuration.TotalSeconds && CurrentState == EnvelopeState.Attack)
-                {
-                    ApplyAttack(ref value, time);
-                }
-                else if (time <= (AttackDuration + DecayDuration).TotalSeconds && CurrentState != EnvelopeState.Release)
-                {
-                    ApplyDecay(ref value, time - AttackDuration.TotalSeconds);
-                }
-                else if (CurrentState != EnvelopeState.Release)
-                {
-                    ApplySustain(ref value);
-                }
-                else
-                {
-                    if (!release && CurrentState == EnvelopeState.Release)
-                    {
-                        releaseTime = TimeSpan.FromSeconds(time);
-                    }
-
-                    if (time >= ReleaseDuration.TotalSeconds)
-                    {
-                        value = 0;
-                        CurrentState = EnvelopeState.Silent;
-                        Released?.Invoke(this, EventArgs.Empty);
-                    }
-                    else
-                    {
-                        ApplyRelease(ref value, time - releaseTime.TotalSeconds);
-                    }
-                }
-
+                ProcessSample(ref value, time);
                 buffer[i] = value;
             }
 
@@ -139,6 +107,46 @@ namespace KSynthesizer.Envelopes
             }
 
             return buffer;
+        }
+
+        private bool releaseLastTime = false;
+        private void ProcessSample(ref float value, double sampleTime)
+        {
+            if (CurrentState == EnvelopeState.Silent)
+            {
+                ApplySilent(ref value);
+            }
+            else if (sampleTime <= AttackDuration.TotalSeconds && CurrentState == EnvelopeState.Attack)
+            {
+                ApplyAttack(ref value, sampleTime);
+            }
+            else if (sampleTime <= (AttackDuration + DecayDuration).TotalSeconds && CurrentState != EnvelopeState.Release)
+            {
+                ApplyDecay(ref value, sampleTime - AttackDuration.TotalSeconds);
+            }
+            else if (sampleTime > (AttackDuration + DecayDuration).TotalSeconds && CurrentState != EnvelopeState.Release)
+            {
+                ApplySustain(ref value);
+            }
+            else
+            {
+                if (CurrentState == EnvelopeState.Release && !releaseLastTime)
+                {
+                    releaseTime = TimeSpan.FromSeconds(sampleTime);
+                    releaseLastTime = true;
+                }
+
+                if (sampleTime >= ReleaseDuration.TotalSeconds)
+                {
+                    value = 0;
+                    CurrentState = EnvelopeState.Silent;
+                    Released?.Invoke(this, EventArgs.Empty);
+                }
+                else
+                {
+                    ApplyRelease(ref value, sampleTime - releaseTime.TotalSeconds);
+                }
+            }
         }
     }
 }

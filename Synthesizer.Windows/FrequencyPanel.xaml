@@ -4,9 +4,24 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Synthesizer.Windows"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             d:DesignHeight="200" d:DesignWidth="300">
+    <StackPanel>
+        <hc:ButtonGroup Height="30">
+            <RadioButton x:Name="lpf" Content="LPF" IsChecked="True" Checked="lpf_Checked"/>
+            <RadioButton x:Name="hpf" Content="HPF" Checked="hpf_Checked"/>
+            <RadioButton x:Name="bpf" Content="BPF" Checked="bpf_Checked"/>
+        </hc:ButtonGroup>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel x:Name="lowStack">
+                <local:Thumb x:Name="lowCutoff" Width="90" Value="0" Minimum="0" Maximum="99" Height="90" LabelVisibility="Collapsed" ValueChanged="lowCutoff_ValueChanged"/>
+                <Label x:Name="lowLabel" Content="0Hz"/>
+            </StackPanel>
+            <StackPanel x:Name="highStack" Visibility="Collapsed">
+                <local:Thumb x:Name="highCutoff" Width="90" Value="1" Minimum="1" Maximum="100" Height="90" LabelVisibility="Collapsed" ValueChanged="highCutoff_ValueChanged"/>
+                <Label x:Name="highLabel" Content="4000Hz"/>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
 </UserControl>

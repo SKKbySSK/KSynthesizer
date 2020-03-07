@@ -30,4 +30,22 @@ namespace KSynthesizer.Envelopes
             return progress;
         }
     }
+
+    public class EasingEnvelopeAlgorithm : IEnvelopeAlgorithm
+    {
+        public float Attack(float progress)
+        {
+            return Easing.CubicOut.Ease(progress);
+        }
+
+        public float Decay(float progress)
+        {
+            return 1 - Easing.CubicOut.Ease(1 - progress);
+        }
+
+        public float Release(float progress)
+        {
+            return 1 - Easing.CubicIn.Ease(1 - progress);
+        }
+    }
 }

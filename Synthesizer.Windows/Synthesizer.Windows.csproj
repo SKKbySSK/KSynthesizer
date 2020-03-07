@@ -1,11 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64</Platforms>
+    <ApplicationIcon />
+    <StartupObject />
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="releases\**" />
+    <EmbeddedResource Remove="releases\**" />
+    <None Remove="releases\**" />
+    <Page Remove="releases\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="syncfusion.lic" />
@@ -17,11 +26,13 @@
 
   <ItemGroup>
     <PackageReference Include="HandyControl" Version="2.4.0" />
+    <PackageReference Include="Melanchall.DryWetMidi" Version="5.0.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.0.0" />
     <PackageReference Include="Syncfusion.SfRadialMenu.WPF" Version="17.4.0.53" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\KSynthesizer.Midi\KSynthesizer.Midi.csproj" />
     <ProjectReference Include="..\KSynthesizer.Soundio\KSynthesizer.Soundio.csproj" />
     <ProjectReference Include="..\KSynthesizer\KSynthesizer.csproj" />
   </ItemGroup>
