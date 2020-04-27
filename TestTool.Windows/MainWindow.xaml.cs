@@ -45,7 +45,7 @@ namespace TestTool.Windows
             filterPanel.Filter = FrequencyFilter;
 
             var passSource = new MixerFilter();
-            passSource.Sources.Add(FrequencyFilter);
+            passSource.AddSource(FrequencyFilter);
             OutputSource = new LastRecordFilter<MixerFilter>(passSource);
 
             BuildMixer();
@@ -58,8 +58,8 @@ namespace TestTool.Windows
 
         private void BuildMixer()
         {
-            MainMixer.Sources.Add(oscPanel.Osc1);
-            MainMixer.Sources.Add(oscPanel.Osc2);
+            MainMixer.AddSource(oscPanel.Osc1);
+            MainMixer.AddSource(oscPanel.Osc2);
         }
 
         private void BuildExport()
@@ -193,8 +193,8 @@ namespace TestTool.Windows
                 source = oscPanel.Osc2.Source;
             }
 
-            MainMixer.Sources.Clear();
-            MainMixer.Sources.Add(source);
+            MainMixer.ClearSources();
+            MainMixer.AddSource(source);
 
             FrequencyFilter output = FrequencyFilter.Source;
 

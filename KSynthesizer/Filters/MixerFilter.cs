@@ -13,25 +13,33 @@ namespace KSynthesizer.Filters
 
     public class MixerFilter : IAudioSource
     {
+        private readonly object lockObj = new object();
+        private readonly List<IAudioSource> sources = new List<IAudioSource>();
+
         public AudioFormat Format => Sources.FirstOrDefault()?.Format ?? new AudioFormat(44100, 1, 32);
 
-        public List<IAudioSource> Sources { get; } = new List<IAudioSource>();
+        public IReadOnlyList<IAudioSource> Sources => sources;
+
+        public int NumberOfSources { get; private set; }
 
         public MixerMode Mode { get; set; } = MixerMode.Average;
 
-        public float TrimVolume { get; set; } = 0.8f;
+        public float TrimVolume { get; set; } = 0.3f;
 
         public float Volume { get; set; } = 1;
         
         public unsafe virtual float[] Next(int size)
         {
-            if (Sources.Count == 1 && Mode == MixerMode.Average)
+            if (NumberOfSources == 1 && Mode == MixerMode.Average)
             {
-                return Sources[0].Next(size);
+                lock (lockObj)
+                {
+                    return sources[0].Next(size);
+                }
             }
 
             var buffer = new float[size];
-            if (Sources.Count == 0)
+            if (NumberOfSources == 0)
             {
                 return buffer;
             }
@@ -39,26 +47,29 @@ namespace KSynthesizer.Filters
             float val;
             fixed (float* buf = buffer)
             {
-                foreach (var source in Sources)
+                lock (lockObj)
                 {
-                    var sourceBuffer = source.Next(size);
-                    for (int i = 0; size > i; i++)
+                    for(int i = 0; NumberOfSources > i; i++)
                     {
-                        fixed (float* srcBuf = sourceBuffer)
+                        var source = sources[i];
+                        var sourceBuffer = source.Next(size);
+                        for (int bufferIndex = 0; size > bufferIndex; bufferIndex++)
                         {
-                            buf[i] += srcBuf[i];
+                            fixed (float* srcBuf = sourceBuffer)
+                            {
+                                buf[bufferIndex] += srcBuf[bufferIndex];
+                            }
                         }
                     }
                 }
 
-                int count = Sources.Count;
                 for (int i = 0; size > i; i++)
                 {
                     val = buf[i];
                     switch(Mode)
                     {
                         case MixerMode.Average:
-                            val = val * Volume / count;
+                            val = val * Volume / NumberOfSources;
                             break;
                         case MixerMode.Trim:
                             val = Math.Min(1, Math.Max(-1, val * TrimVolume));
@@ -69,6 +80,42 @@ namespace KSynthesizer.Filters
             }
 
             return buffer;
+        }
+
+        public void AddSources(IEnumerable<IAudioSource> sources)
+        {
+            lock(lockObj)
+            {
+                this.sources.AddRange(sources);
+                NumberOfSources = this.sources.Count;
+            }
+        }
+
+        public void AddSource(IAudioSource source)
+        {
+            lock (lockObj)
+            {
+                sources.Add(source);
+                NumberOfSources = sources.Count;
+            }
+        }
+
+        public void RemoveSource(IAudioSource source)
+        {
+            lock (lockObj)
+            {
+                sources.Remove(source);
+                NumberOfSources = sources.Count;
+            }
+        }
+
+        public void ClearSources()
+        {
+            lock(lockObj)
+            {
+                sources.Clear();
+                NumberOfSources = 0;
+            }
         }
     }
 }

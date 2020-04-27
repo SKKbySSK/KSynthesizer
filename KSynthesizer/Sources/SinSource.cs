@@ -12,13 +12,15 @@ namespace KSynthesizer.Sources
 
         protected override void GenerateNextBufferForPeriod(float[] buffer)
         {
-            double periodSec = Period / 1000;
-            double sinParam = 2 * Math.PI / periodSec;
+            float periodSec = Period / 1000;
+            float sinParam = 2 * MathF.PI / periodSec;
+            float sampleRate = Format.SampleRate;
+            float deltaTime;
 
             for (int i = 0; buffer.Length > i; i++)
             {
-                double deltaTime = i / (double)Format.SampleRate;
-                buffer[i] = (float)Math.Sin(sinParam * deltaTime);
+                deltaTime = i / sampleRate;
+                buffer[i] = MathF.Sin(sinParam * deltaTime);
             }
         }
     }

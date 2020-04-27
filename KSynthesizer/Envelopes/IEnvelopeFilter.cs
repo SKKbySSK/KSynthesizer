@@ -48,7 +48,7 @@ namespace KSynthesizer.Envelopes
 
         public EnvelopeState CurrentState { get; private set; } = EnvelopeState.Silent;
 
-        public IEnvelopeAlgorithm Algorithm { get; set; } = new EasingEnvelopeAlgorithm();
+        public IEnvelopeAlgorithm Algorithm { get; set; } = new LinearEnvelopeAlgorithm();
 
         public AudioFormat Format => Source.Format;
 

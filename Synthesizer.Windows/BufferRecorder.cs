@@ -20,8 +20,29 @@ namespace Synthesizer.Windows
 
         public int BufferLength { get; set; } = 1024;
 
+        public bool IsRecording { get; private set; } = false;
+
+        public void Record()
+        {
+            IsRecording = true;
+        }
+
+        public void Stop()
+        {
+            IsRecording = false;
+            lock(this)
+            {
+                lastBuffer.Clear();
+            }
+        }
+
         public void Append(float[] buffer)
         {
+            if (!IsRecording)
+            {
+                return;
+            }
+
             lastBuffer.AddRange(buffer);
 
             if (lastBuffer.Count > BufferLength)

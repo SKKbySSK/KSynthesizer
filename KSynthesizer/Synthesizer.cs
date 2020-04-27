@@ -11,101 +11,60 @@ namespace KSynthesizer
         public FunctionType Function { get; set; } = FunctionType.Sin;
 
         public float Frequency { get; set; } = 440;
+
+        protected internal virtual IAudioSource CreateSource(int sampleRate)
+        {
+            return new PeriodicFunctionsSource(sampleRate)
+            {
+                Function = Function,
+                Period = 1000 / Frequency,
+            };
+        }
     }
 
-    class SynthesizerInput
+    public class SynthesizerInput
     {
         public SynthesizerInput()
         {
-            Envelope = new VolumeEnvelope(Mixer);
+            Envelope = new VolumeEnvelope2(Mixer);
         }
 
         public void ConfigureInput(int sampleRate, IEnumerable<OscillatorConfig> configurations)
         {
-            Mixer.Sources.Clear();
+            Mixer.ClearSources();
             foreach (var config in configurations)
             {
-                Mixer.Sources.Add(new PeriodicFunctionsSource(sampleRate)
-                {
-                    Function = config.Function,
-                    Period = 1000 / config.Frequency,
-                });
+                Mixer.AddSource(config.CreateSource(sampleRate));
             }
         }
 
         public MixerFilter Mixer { get; } = new MixerFilter();
 
-        public VolumeEnvelope Envelope { get; }
+        public IEnvelopeFilter Envelope { get; }
     }
 
     public class Synthesizer : IAudioSource
     {
-        private readonly SynthesizerInput[] inputs;
-        private readonly MixerFilter mixer = new MixerFilter();
+        private readonly Dictionary<int, SynthesizerInput> inputs = new Dictionary<int, SynthesizerInput>();
+        private readonly MixerFilter mixer = new MixerFilter() { Mode = MixerMode.Trim }; 
         private readonly object lockObj = new object();
-        private int index;
+        private int id;
         
         public Synthesizer(int sampleRate, int inputCount)
         {
             Format = new AudioFormat(sampleRate, 1, 32);
-            inputs = new SynthesizerInput[inputCount];
-            for (int i = 0; inputCount > i; i++)
-            {
-                var input = new SynthesizerInput();
-                inputs[i] = input;
-                mixer.Sources.Add(input.Envelope);
-            }
+            mixer.TrimVolume = 1f / inputCount;
 
             FrequencyFilter = new FrequencyFilter(mixer);
         }
 
-        public TimeSpan AttackDuration
-        {
-            get => inputs[0].Envelope.AttackDuration;
-            set
-            {
-                foreach (var env in inputs)
-                {
-                    env.Envelope.AttackDuration = value;
-                }
-            }
-        }
+        public TimeSpan AttackDuration { get; set; }
 
-        public TimeSpan DecayDuration
-        {
-            get => inputs[0].Envelope.DecayDuration;
-            set
-            {
-                foreach (var env in inputs)
-                {
-                    env.Envelope.DecayDuration = value;
-                }
-            }
-        }
+        public TimeSpan DecayDuration { get; set; }
 
-        public float Sustain
-        {
-            get => inputs[0].Envelope.Sustain;
-            set
-            {
-                foreach (var env in inputs)
-                {
-                    env.Envelope.Sustain = value;
-                }
-            }
-        }
-        
-        public TimeSpan ReleaseDuration
-        {
-            get => inputs[0].Envelope.ReleaseDuration;
-            set
-            {
-                foreach (var env in inputs)
-                {
-                    env.Envelope.ReleaseDuration = value;
-                }
-            }
-        }
+        public float Sustain { get; set; }
+
+        public TimeSpan ReleaseDuration { get; set; }
 
         public float MixerVolume
         {
@@ -119,40 +78,85 @@ namespace KSynthesizer
 
         public int Attack(IEnumerable<OscillatorConfig> configurations)
         {
-            var index = NextInput();
-            var input = inputs[index];
+            var input = new SynthesizerInput();
             lock(lockObj)
             {
+                var id = NextInput();
+                inputs[id] = input;
                 input.ConfigureInput(Format.SampleRate, configurations);
+                mixer.AddSource(input.Envelope);
+                InitializeInput(input);
+                input.Envelope.Attack();
+
+                return id;
             }
-            input.Envelope.Attack();
-            return index;
         }
 
-        public void Attack(IEnumerable<OscillatorConfig> configurations, int index)
+        public void Attack(IEnumerable<OscillatorConfig> configurations, int id)
         {
-            var input = inputs[index];
             lock (lockObj)
             {
+                SynthesizerInput input;
+                if (inputs.ContainsKey(id))
+                {
+                    input = inputs[id];
+                }
+                else
+                {
+                    input = new SynthesizerInput();
+                    inputs[id] = input;
+                    mixer.AddSource(input.Envelope);
+                }
+                InitializeInput(input);
+
                 input.ConfigureInput(Format.SampleRate, configurations);
+                input.Envelope.Attack();
             }
-            input.Envelope.Attack();
         }
 
-        public void Release(int index)
+        public void Release(int id)
         {
-            inputs[index].Envelope.Release();
+            lock(lockObj)
+            {
+                if (inputs.TryGetValue(id, out var input))
+                {
+                    input.Envelope.Released += OnEnvelopeReleased;
+                    input.Envelope.Release();
+                }
+            }
+
+            void OnEnvelopeReleased(object sender, EventArgs e)
+            {
+                var envelope = (IEnvelopeFilter)sender;
+                envelope.Released -= OnEnvelopeReleased;
+
+                lock (lockObj)
+                {
+                    inputs.Remove(id);
+                    mixer.RemoveSource(envelope);
+                }
+            }
+        }
+
+        public Dictionary<int, SynthesizerInput> GetInputs()
+        {
+            lock(lockObj)
+            {
+                return new Dictionary<int, SynthesizerInput>(inputs);
+            }
         }
 
         private int NextInput()
         {
-            index++;
-            if (index >= inputs.Length)
-            {
-                index = 0;
-            }
+            return id++;
+        }
 
-            return index;
+        private void InitializeInput(SynthesizerInput input)
+        {
+            input.Envelope.AttackDuration = AttackDuration;
+            input.Envelope.DecayDuration = DecayDuration;
+            input.Envelope.Sustain = Sustain;
+            input.Envelope.ReleaseDuration = ReleaseDuration;
         }
 
         public float[] Next(int size)

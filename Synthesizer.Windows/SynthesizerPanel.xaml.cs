@@ -111,6 +111,7 @@ namespace Synthesizer.Windows
                 if (Interceptable.Source is MidiPlayer midi)
                 {
                     midi.Finished -= Source_Finished;
+                    midi.EventReceived -= Source_EventReceived;
                 }
 
                 Interceptable.Source = Synthesizer;
@@ -118,13 +119,30 @@ namespace Synthesizer.Windows
                 UpdateSynthesizer();
                 return;
             }
+
+            source.EventReceived += Source_EventReceived;
             source.OscillatorConfigs.Clear();
-            source.OscillatorConfigs.AddRange(GenerateConfig(0, 0));
+            source.OscillatorConfigs.AddRange(GenerateMidiConfig());
             source.Finished += Source_Finished;
             CustomMidiSource = source;
             Interceptable.Source = source;
             IsCustomMode = true;
             UpdateSynthesizer();
+        }
+
+        private void Source_EventReceived(object sender, MidiEventArgs e)
+        {
+            if (e.Processed)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"[MIDI] Processed : {e.Event}");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"[MIDI] Ignored : {e.Event}");
+            }
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         private void Source_Finished(object sender, EventArgs e)
@@ -230,22 +248,24 @@ namespace Synthesizer.Windows
             return GenerateConfig(Scale.GetFrequency(tone1), Scale.GetFrequency(tone2));
         }
 
+        private List<OscillatorConfig> GenerateMidiConfig()
+        {
+            return new List<OscillatorConfig>(new[]
+            {
+                new OscillatorConfig(){ Function = Osc1.Function },
+            });
+        }
+
         private List<OscillatorConfig> GenerateConfig(float freq1, float freq2)
         {
-            var configurations = new List<OscillatorConfig>();
-            configurations.Add(new OscillatorConfig()
+            return Helper.ConfigGenerator.GenerateConfig(new []
             {
-                Function = Osc1.Function,
-                Frequency = freq1,
-            });
-
-            configurations.Add(new OscillatorConfig()
+                (Osc1.Function, freq1),
+                (Osc2.Function, freq2),
+            }, (filter) =>
             {
-                Function = Osc2.Function,
-                Frequency = freq2,
+                filter.Beta = (float)((modBeta.Value / 100) * 15);
             });
-
-            return configurations;
         }
 
         private IonianTone? GetToneForKey(Key key, int octave)
@@ -317,7 +337,6 @@ namespace Synthesizer.Windows
             if (CustomMidiSource != null)
             {
                 CustomMidiSource.OscillatorConfigs[0].Function = Osc1.Function;
-                CustomMidiSource.OscillatorConfigs[1].Function = Osc2.Function;
             }
         }
 

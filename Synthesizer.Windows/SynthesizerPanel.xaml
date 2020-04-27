@@ -27,5 +27,6 @@
         <local:Thumb x:Name="semitone1" HorizontalAlignment="Left" Margin="20,0,0,136" VerticalAlignment="Bottom" Height="94" Width="100" Value="0" Minimum="-12" Maximum="24" TickFrequency="3"/>
         <local:Thumb x:Name="semitone2" HorizontalAlignment="Left" Margin="145,0,0,131" VerticalAlignment="Bottom" Height="94" Width="100" Value="0" Minimum="-12" Maximum="24" TickFrequency="3"/>
         <local:FrequencyPanel x:Name="freqPanel" HorizontalAlignment="Left" Height="163" Margin="260,48,0,0" VerticalAlignment="Top" Width="182"/>
+        <local:Thumb x:Name="modBeta" HorizontalAlignment="Left" Margin="20,169,0,0" VerticalAlignment="Top" Height="74" Width="82" Minimum="0" Maximum="100" LabelVisibility="Collapsed"/>
     </Grid>
 </UserControl>
