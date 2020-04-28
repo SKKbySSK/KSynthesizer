@@ -59,7 +59,6 @@ namespace KSynthesizer.Soundio
             outstream = Device.CreateOutStream();
             outstream.WriteCallback = (min, max) => write_callback(outstream, min, max);
             outstream.UnderflowCallback = () => underflow_callback(outstream);
-            outstream.SoftwareLatency = 0;
             outstream.SampleRate = Format.SampleRate;
 
             if (Device.SupportsFormat(SoundIODevice.Float32NE))

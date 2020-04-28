@@ -19,13 +19,13 @@ namespace Synthesizer.Windows
         {
             base.OnStartup(e);
 
-            var assembly = Assembly.GetExecutingAssembly();
-            using (Stream stream = assembly.GetManifestResourceStream("Synthesizer.Windows.syncfusion.lic"))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                string result = reader.ReadToEnd();
-                Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(result);
-            }
+            //var assembly = Assembly.GetExecutingAssembly();
+            //using (Stream stream = assembly.GetManifestResourceStream("Synthesizer.Windows.syncfusion.lic"))
+            //using (StreamReader reader = new StreamReader(stream))
+            //{
+            //    string result = reader.ReadToEnd();
+            //    Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(result);
+            //}
         }
     }
 }

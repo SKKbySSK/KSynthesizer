@@ -2,6 +2,7 @@
 using KSynthesizer.Filters;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Synthesizer.Windows
@@ -21,6 +22,8 @@ namespace Synthesizer.Windows
         public int BufferLength { get; set; } = 1024;
 
         public bool IsRecording { get; private set; } = false;
+
+        private BinaryWriter binaryWriter = new BinaryWriter(new FileStream("test.raw", FileMode.Create));
 
         public void Record()
         {
@@ -44,6 +47,11 @@ namespace Synthesizer.Windows
             }
 
             lastBuffer.AddRange(buffer);
+            foreach(var b in buffer)
+            {
+                binaryWriter.Write(b);
+            }
+            binaryWriter.Flush();
 
             if (lastBuffer.Count > BufferLength)
             {

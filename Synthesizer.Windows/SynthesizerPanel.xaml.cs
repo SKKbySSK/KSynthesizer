@@ -96,6 +96,7 @@ namespace Synthesizer.Windows
             devicesBox.SelectedIndex = defaultDevice;
 
             Recorder = new BufferRecorder(Format);
+            Recorder.Record();
             waveView.PlotSource = Recorder;
 
             Synthesizer = new KSynthesizer.Synthesizer(Format.SampleRate, 8);

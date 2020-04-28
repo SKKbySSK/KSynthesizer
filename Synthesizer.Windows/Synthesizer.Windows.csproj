@@ -21,10 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="syncfusion.lic" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="HandyControl" Version="2.4.0" />
     <PackageReference Include="Melanchall.DryWetMidi" Version="5.0.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.0.0" />

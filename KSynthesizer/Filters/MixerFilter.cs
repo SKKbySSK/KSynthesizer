@@ -22,9 +22,9 @@ namespace KSynthesizer.Filters
 
         public int NumberOfSources { get; private set; }
 
-        public MixerMode Mode { get; set; } = MixerMode.Average;
+        public MixerMode Mode { get; set; } = MixerMode.Trim;
 
-        public float TrimVolume { get; set; } = 0.3f;
+        public float TrimVolume { get; set; } = 0.7f;
 
         public float Volume { get; set; } = 1;
         
