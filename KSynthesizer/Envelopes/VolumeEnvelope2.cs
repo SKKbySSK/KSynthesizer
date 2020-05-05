@@ -13,7 +13,7 @@ namespace KSynthesizer.Envelopes
 
         public event EventHandler Released;
 
-        public TimeSpan AttackDuration { get; set; } = TimeSpan.FromMilliseconds(300);
+        public TimeSpan AttackDuration { get; set; } = TimeSpan.FromMilliseconds(500);
 
         public TimeSpan DecayDuration { get; set; } = TimeSpan.FromMilliseconds(500);
 

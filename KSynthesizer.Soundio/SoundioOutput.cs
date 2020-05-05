@@ -7,6 +7,7 @@ namespace KSynthesizer.Soundio
     public class SoundioOutput : IAudioOutput
     {
         private readonly SoundIO api = new SoundIO();
+        private RingBuffer<float> ringBuffer;
         private SoundIOOutStream outstream;
 
         public SoundioOutput()
@@ -28,12 +29,10 @@ namespace KSynthesizer.Soundio
                 }
             }
         }
-        
-        public event EventHandler<FillBufferEventArgs> FillBuffer;
 
         public event EventHandler Underflow;
 
-        public TimeSpan Latency { get; set; } = TimeSpan.FromMilliseconds(10);
+        public event EventHandler<int> WillFilled;
 
         public SoundIODevice Device { get; private set; }
 
@@ -43,14 +42,28 @@ namespace KSynthesizer.Soundio
         
         public AudioFormat Format { get; private set; }
         
-        public void SetDevice(SoundIODevice device, AudioFormat format)
+        public TimeSpan DesiredLatency { get; set; } = TimeSpan.FromMilliseconds(10);
+        
+        public TimeSpan ActualLatency { get; private set; }
+
+        public void Write(float[] buffer)
         {
+            ringBuffer.Enqueue(buffer);
+        }
+        
+        public void Initialize(SoundIODevice device, AudioFormat format)
+        {
+            if (format.Channels != 1 || format.BitDepth != 32)
+            {
+                throw new OutputInitializationException("Format must qualify channels == 1 && bitDepth == 32");
+            }
+            
             Device = device;
             Format = format;
-        }
 
-        public void Play()
-        {
+            var bytesPerSample = format.BitDepth / 8;
+            var capacity = Format.SampleRate * Format.Channels * bytesPerSample * 30;
+            ringBuffer = new RingBuffer<float>((uint)capacity);
             if (Device.ProbeError != 0)
             {
                 throw new OutputInitializationException($"Probe Error : {Device.ProbeError}");
@@ -60,6 +73,7 @@ namespace KSynthesizer.Soundio
             outstream.WriteCallback = (min, max) => write_callback(outstream, min, max);
             outstream.UnderflowCallback = () => underflow_callback(outstream);
             outstream.SampleRate = Format.SampleRate;
+            outstream.SoftwareLatency = DesiredLatency.TotalSeconds;
 
             if (Device.SupportsFormat(SoundIODevice.Float32NE))
             {
@@ -74,15 +88,15 @@ namespace KSynthesizer.Soundio
             }
             
             outstream.Open();
+            outstream.SoftwareLatency = DesiredLatency.TotalSeconds;
+            api.FlushEvents();
 
-            if (outstream.LayoutErrorMessage != null)
-            {
-                outstream.Dispose();
-                outstream = null;
-                
-                throw new OutputInitializationException($"Channel Layout Error : {outstream.LayoutErrorMessage}");
-            }
+            ActualLatency = TimeSpan.FromSeconds(outstream.SoftwareLatency);
 
+        }
+
+        public void Play()
+        {
             outstream.Start();
         }
 
@@ -99,8 +113,8 @@ namespace KSynthesizer.Soundio
         }
         
         void write_callback(SoundIOOutStream outstream, int frame_count_min, int frame_count_max)
-        {
-            double desiredSize = Latency.TotalSeconds * Format.SampleRate * Format.Channels;
+        {            
+            double desiredSize = DesiredLatency.TotalSeconds * Format.SampleRate * Format.Channels;
             int frame_count = (int)Math.Max(frame_count_min, desiredSize);
             frame_count = Math.Min(frame_count, frame_count_max);
             if (frame_count == 0)
@@ -109,10 +123,9 @@ namespace KSynthesizer.Soundio
             }
 
             var results = outstream.BeginWrite(ref frame_count);
-            
-            FillBufferEventArgs fillBuffer = new FillBufferEventArgs(Format, frame_count);
-            FillBuffer?.Invoke(this, fillBuffer);
-            bool noBuffer = fillBuffer.Buffer == null;
+            WillFilled?.Invoke(this, frame_count);
+            var samples = new float[frame_count];
+            ringBuffer.Dequeue(samples);
 
             SoundIOChannelLayout layout = outstream.Layout;
             for (int frame = 0; frame < frame_count; frame++)
@@ -120,7 +133,7 @@ namespace KSynthesizer.Soundio
                 for (int channel = 0; channel < layout.ChannelCount; channel++)
                 {
                     var area = results.GetArea(channel);
-                    write_sample(area.Pointer, noBuffer ? 0 : fillBuffer.Buffer[frame]);
+                    write_sample(area.Pointer, samples[frame]);
                     area.Pointer += area.Step;
                 }
             }

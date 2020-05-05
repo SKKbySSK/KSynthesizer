@@ -12,12 +12,15 @@ namespace KSynthesizer
 
         public float Frequency { get; set; } = 440;
 
+        public float Volume { get; set; } = 0.3f;
+
         protected internal virtual IAudioSource CreateSource(int sampleRate)
         {
             return new PeriodicFunctionsSource(sampleRate)
             {
                 Function = Function,
                 Period = 1000 / Frequency,
+                Volume = Volume,
             };
         }
     }
@@ -46,15 +49,13 @@ namespace KSynthesizer
     public class Synthesizer : IAudioSource
     {
         private readonly Dictionary<int, SynthesizerInput> inputs = new Dictionary<int, SynthesizerInput>();
-        private readonly MixerFilter mixer = new MixerFilter() { Mode = MixerMode.Trim }; 
+        private readonly MixerFilter mixer = new MixerFilter();
         private readonly object lockObj = new object();
         private int id;
         
         public Synthesizer(int sampleRate, int inputCount)
         {
             Format = new AudioFormat(sampleRate, 1, 32);
-            mixer.TrimVolume = 1f / inputCount;
-
             FrequencyFilter = new FrequencyFilter(mixer);
         }
 

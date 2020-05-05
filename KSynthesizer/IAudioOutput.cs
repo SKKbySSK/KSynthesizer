@@ -40,11 +40,11 @@ namespace KSynthesizer
     
     public interface IAudioOutput : IDisposable
     {
-        event EventHandler<FillBufferEventArgs> FillBuffer;
-        
         AudioFormat Format { get; }
         
-        TimeSpan Latency { get; set; }
+        TimeSpan DesiredLatency { get; set; }
+        
+        TimeSpan ActualLatency { get; }
 
         void Play();
 

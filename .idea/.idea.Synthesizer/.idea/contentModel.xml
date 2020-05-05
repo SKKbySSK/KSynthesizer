@@ -1,16 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
-    <e p="$PROJECT_DIR$" t="IncludeFlat">
+    <e p="C:\Users\Kaisei\AppData\local\JetBrains\Rider2020.1\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\Kaisei\AppData\local\JetBrains\Rider2020.1\resharper-host\local\Transient\ReSharperHost\v201\SolutionCaches\_Synthesizer.-2069495460.00" t="ExcludeRecursive" />
+    <e p="C:\Users\Kaisei\Documents\Projects\KSynthesizer" t="IncludeFlat">
+      <e p="GSynthesizer.Windows" t="IncludeRecursive">
+        <e p="App.xaml" t="Include" />
+        <e p="App.xaml.cs" t="Include" />
+        <e p="AssemblyInfo.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="GSynthesizer.Windows.csproj" t="IncludeRecursive" />
+        <e p="MainWindow.xaml" t="Include" />
+        <e p="MainWindow.xaml.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="x64" t="Include">
+            <e p="Debug" t="Include">
+              <e p="netcoreapp3.1" t="Include">
+                <e p="App.g.cs" t="Include" />
+                <e p="GSynthesizer.Windows.AssemblyInfo.cs" t="Include" />
+                <e p="MainWindow.g.cs" t="Include" />
+              </e>
+            </e>
+          </e>
+        </e>
+      </e>
       <e p="KSynthesizer" t="IncludeRecursive">
         <e p="AudioFormat.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="BufferSink.cs" t="Include" />
-        <e p="EnvelopeGenerator.cs" t="Include" />
+        <e p="Clock.cs" t="Include" />
+        <e p="Easing.cs" t="Include" />
+        <e p="Envelopes" t="Include">
+          <e p="EnvelopeGenerator.cs" t="Include" />
+          <e p="EnvelopeState.cs" t="Include" />
+          <e p="FilterEnvelope.cs" t="Include" />
+          <e p="IEnvelopeAlgorithm.cs" t="Include" />
+          <e p="IEnvelopeFilter.cs" t="Include" />
+          <e p="VolumeEnvelope.cs" t="Include" />
+          <e p="VolumeEnvelope2.cs" t="Include" />
+        </e>
         <e p="Filters" t="Include">
           <e p="AudioFilterBase.cs" t="Include" />
           <e p="BiQuadFilter.cs" t="Include" />
           <e p="FrequencyFilter.cs" t="Include" />
+          <e p="FrequencyModulationFilter.cs" t="Include" />
           <e p="MixerFilter.cs" t="Include" />
         </e>
         <e p="IAudioFilter.cs" t="Include" />
@@ -18,15 +51,19 @@
         <e p="IAudioSource.cs" t="Include" />
         <e p="KSynthesizer.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
-          <e p="Debug" t="Include">
-            <e p="netcoreapp3.0" t="Include">
-              <e p="KSynthesizer.AssemblyInfo.cs" t="Include" />
-            </e>
-            <e p="netstandard2.1" t="Include">
-              <e p="KSynthesizer.AssemblyInfo.cs" t="Include" />
+          <e p="x64" t="Include">
+            <e p="Debug" t="Include">
+              <e p="netcoreapp3.0" t="Include">
+                <e p="KSynthesizer.AssemblyInfo.cs" t="Include" />
+              </e>
+              <e p="netstandard2.1" t="Include">
+                <e p="KSynthesizer.AssemblyInfo.cs" t="Include" />
+              </e>
             </e>
           </e>
         </e>
+        <e p="RingBuffer.cs" t="Include" />
+        <e p="Scale.cs" t="Include" />
         <e p="Sources" t="Include">
           <e p="Abstracts" t="Include">
             <e p="FunctionalAudioSourceBase.cs" t="Include" />
@@ -56,26 +93,49 @@
         <e p="KeyboardInput.cs" t="Include" />
         <e p="KSynthesizer.Linux.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
-          <e p="Debug" t="Include">
-            <e p="netstandard2.1" t="Include">
-              <e p="KSynthesizer.Linux.AssemblyInfo.cs" t="Include" />
+          <e p="x64" t="Include">
+            <e p="Debug" t="Include">
+              <e p="netstandard2.1" t="Include">
+                <e p="KSynthesizer.Linux.AssemblyInfo.cs" t="Include" />
+              </e>
             </e>
           </e>
         </e>
+      </e>
+      <e p="KSynthesizer.Midi" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Helpers" t="Include">
+          <e p="TimeConverter.cs" t="Include" />
+        </e>
+        <e p="KSynthesizer.Midi.csproj" t="IncludeRecursive" />
+        <e p="MidiBuffer.cs" t="Include" />
+        <e p="MidiPlayer.cs" t="Include" />
+        <e p="MidiTrackController.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="x64" t="Include">
+            <e p="Debug" t="Include">
+              <e p="netstandard2.1" t="Include">
+                <e p="KSynthesizer.Midi.AssemblyInfo.cs" t="Include" />
+              </e>
+            </e>
+          </e>
+        </e>
+        <e p="TempoChanger.cs" t="Include" />
       </e>
       <e p="KSynthesizer.Soundio" t="IncludeRecursive">
         <e p="bin" t="ExcludeRecursive" />
         <e p="KSynthesizer.Soundio.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
-          <e p="Debug" t="Include">
-            <e p="netstandard2.1" t="Include">
-              <e p="KSynthesizer.Soundio.AssemblyInfo.cs" t="Include" />
+          <e p="x64" t="Include">
+            <e p="Debug" t="Include">
+              <e p="netstandard2.1" t="Include">
+                <e p="KSynthesizer.Soundio.AssemblyInfo.cs" t="Include" />
+              </e>
             </e>
           </e>
         </e>
         <e p="SoundioOutput.cs" t="Include" />
         <e p="submodule" t="Include">
-          <e p=".git" t="Include" />
           <e p="libsoundio-sharp" t="Include">
             <e p="libs" t="Include">
               <e p="libsoundio.dylib" t="Include" />
@@ -100,93 +160,22 @@
           </e>
         </e>
       </e>
-      <e p="packages" t="ExcludeRecursive" />
-      <e p="Synthesizer.sln" t="IncludeFlat" />
-      <e p="TestTool.Platform" t="IncludeRecursive">
-        <e p=".gitignore" t="Include" />
-        <e p="AudioPlayer.cs" t="Include" />
+      <e p="KSynthesizer.Soundio.Test" t="IncludeRecursive">
         <e p="bin" t="ExcludeRecursive" />
-        <e p="CommonInput.cs" t="Include" />
-        <e p="connect.sh" t="Include" />
-        <e p="IConsoleInput.cs" t="Include" />
-        <e p="libsoundio-sharp" t="Include">
-          <e p="libsoundio-sharp" t="Include">
-            <e p="libs" t="Include">
-              <e p="libsoundio.dylib" t="Include" />
-              <e p="libsoundio.so" t="Include" />
-            </e>
-            <e p="libsoundio-interop.cs" t="Include" />
-            <e p="MarshalExtensions.cs" t="Include" />
-            <e p="SoundIO.cs" t="Include" />
-            <e p="SoundIOBackend.cs" t="Include" />
-            <e p="SoundIOChannelArea.cs" t="Include" />
-            <e p="SoundIOChannelAreas.cs" t="Include" />
-            <e p="SoundIOChannelId.cs" t="Include" />
-            <e p="SoundIOChannelLayout.cs" t="Include" />
-            <e p="SoundIODevice.cs" t="Include" />
-            <e p="SoundIODeviceAim.cs" t="Include" />
-            <e p="SoundIOException.cs" t="Include" />
-            <e p="SoundIOFormat.cs" t="Include" />
-            <e p="SoundIOInStream.cs" t="Include" />
-            <e p="SoundIOOutStream.cs" t="Include" />
-            <e p="SoundIORingBuffer.cs" t="Include" />
-            <e p="SoundIOSampleRateRange.cs" t="Include" />
-          </e>
-        </e>
-        <e p="LinuxInput.cs" t="Include" />
+        <e p="KSynthesizer.Soundio.Test.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
-          <e p="Debug" t="Include">
-            <e p="netcoreapp3.0" t="Include">
-              <e p="TestTool.Platform.AssemblyInfo.cs" t="Include" />
+          <e p="x64" t="Include">
+            <e p="Debug" t="Include">
+              <e p="netcoreapp3.1" t="Include">
+                <e p="KSynthesizer.Soundio.Test.AssemblyInfo.cs" t="Include" />
+              </e>
             </e>
           </e>
         </e>
         <e p="Program.cs" t="Include" />
-        <e p="publish-and-sync.sh" t="Include" />
-        <e p="publish-linux-arm.sh" t="Include" />
-        <e p="TestTool.Platform.csproj" t="IncludeRecursive" />
       </e>
-      <e p="TestTool.Windows" t="IncludeRecursive">
-        <e p="App.xaml" t="Include" />
-        <e p="App.xaml.cs" t="Include" />
-        <e p="bin" t="ExcludeRecursive" />
-        <e p="DurationDialog.xaml" t="Include" />
-        <e p="DurationDialog.xaml.cs" t="Include" />
-        <e p="FrequencyDialog.xaml" t="Include" />
-        <e p="FrequencyDialog.xaml.cs" t="Include" />
-        <e p="ILastBufferRecord.cs" t="Include" />
-        <e p="LastRecordFilter.cs" t="Include" />
-        <e p="MainWindow.xaml" t="Include" />
-        <e p="MainWindow.xaml.cs" t="Include" />
-        <e p="obj" t="ExcludeRecursive">
-          <e p="Debug" t="Include">
-            <e p="netcoreapp3.1" t="Include">
-              <e p="TestTool.Windows.AssemblyInfo.cs" t="Include" />
-            </e>
-          </e>
-        </e>
-        <e p="Panels" t="Include">
-          <e p="FilterPanel.xaml" t="Include" />
-          <e p="FilterPanel.xaml.cs" t="Include" />
-          <e p="OscillatorPanel.xaml" t="Include" />
-          <e p="OscillatorPanel.xaml.cs" t="Include" />
-        </e>
-        <e p="SynhesizerWaveWriter.cs" t="Include" />
-        <e p="SynthesizerWaveProvider.cs" t="Include" />
-        <e p="TestTool.Windows.csproj" t="IncludeRecursive" />
-        <e p="Views" t="Include">
-          <e p="FftView.xaml" t="Include" />
-          <e p="FftView.xaml.cs" t="Include" />
-          <e p="LabelSlider.xaml" t="Include" />
-          <e p="LabelSlider.xaml.cs" t="Include" />
-          <e p="Oscillator.xaml" t="Include" />
-          <e p="Oscillator.xaml.cs" t="Include" />
-          <e p="WaveView.xaml" t="Include" />
-          <e p="WaveView.xaml.cs" t="Include" />
-        </e>
-      </e>
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Synthesizer.sln" t="IncludeFlat" />
     </e>
-    <e p="$USER_HOME$/Library/Caches/Rider2019.2/extResources" t="IncludeRecursive" />
-    <e p="$USER_HOME$/Library/Caches/Rider2019.2/resharper-host/local/Transient/ReSharperHost/v192/SolutionCaches/_Synthesizer.622606163.00" t="ExcludeRecursive" />
   </component>
 </project>

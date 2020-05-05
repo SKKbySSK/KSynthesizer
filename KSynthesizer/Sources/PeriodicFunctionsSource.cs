@@ -50,6 +50,8 @@ namespace KSynthesizer.Sources
             Format = new AudioFormat(sampleRate, 1, 32);
         }
 
+        public float Volume { get; set; } = 1;
+
         public override float Period
         {
             get => base.Period;
@@ -88,7 +90,14 @@ namespace KSynthesizer.Sources
 
         public override float[] Next(int size)
         {
-            return sources[Function]?.Next(size) ?? new float[size];
+            var buffer = sources[Function]?.Next(size) ?? new float[size];
+
+            for (var i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] *= Volume;
+            }
+
+            return buffer;
         }
 
         protected override void GenerateNextBufferForPeriod(float[] buffer)

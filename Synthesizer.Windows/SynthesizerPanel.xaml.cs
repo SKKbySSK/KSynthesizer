@@ -77,6 +77,8 @@ namespace Synthesizer.Windows
         public BufferRecorder Recorder { get; }
 
         public AudioFormat Format { get; } = new AudioFormat(44100, 1, 32);
+        
+        public Clock Clock { get; } = new Clock(TimeSpan.FromMilliseconds(100));
 
         public SynthesizerPanel()
         {
@@ -103,6 +105,22 @@ namespace Synthesizer.Windows
             Interceptable.Source = Synthesizer;
             Interceptable.Intercept(Interceptor);
             UpdateSynthesizer();
+            
+            Clock.Tick += ClockOnTick;
+            Output.WillFilled += OutputOnWillFilled;
+        }
+
+        private void OutputOnWillFilled(object? sender, int e)
+        {
+            var buffer = Interceptable.Next(e);
+            Output.Write(buffer);
+        }
+
+        private void ClockOnTick(object? sender, EventArgs e)
+        {
+            // var size = Format.Channels * Format.SampleRate * Format.BitDepth / 8 * Output.ActualLatency.TotalSeconds;
+            // var buffer = Interceptable.Next((int) size);
+            // Output.Write(buffer);
         }
 
         public void SetCustomMidiSource(MidiPlayer source)
@@ -160,11 +178,14 @@ namespace Synthesizer.Windows
             {
                 try
                 {
-                    Output.SetDevice(Output.Devices[devicesBox.SelectedIndex], Format);
-                    Output.FillBuffer += Output_FillBuffer;
+                    Output.DesiredLatency = Clock.Interval;
+                    Output.Initialize(Output.Devices[devicesBox.SelectedIndex], Format);
                     Volume = (float)volumeSlider.Value;
 
                     Output.Play();
+                    Clock.Interval = Output.ActualLatency;
+                    Clock.Start();
+                    
                     waveView.Play();
                     devicesBox.IsEnabled = false;
                     prepareButton.Visibility = Visibility.Hidden;
@@ -178,22 +199,9 @@ namespace Synthesizer.Windows
             }
         }
 
-        private void Output_FillBuffer(object sender, FillBufferEventArgs e)
-        {
-            int channelLen = e.Size / e.Format.Channels;
-            var channelBuffer = Interceptable.Next(channelLen);
-            var buffer = new float[e.Size];
-
-            for (int i = 0; e.Format.Channels > i; i++)
-            {
-                Array.Copy(channelBuffer, 0, buffer, i * channelLen, channelLen);
-            }
-
-            e.Configure(buffer);
-        }
-
         private void stopButton_Click(object sender, RoutedEventArgs e)
         {
+            Clock.Stop();
             waveView.Pause();
             devicesBox.IsEnabled = true;
             stopButton.Visibility = Visibility.Hidden;
@@ -203,6 +211,7 @@ namespace Synthesizer.Windows
         public void Dispose()
         {
             SetCustomMidiSource(null);
+            Clock.Stop();
             waveView.Pause();
             Output.Dispose();
         }
@@ -345,7 +354,7 @@ namespace Synthesizer.Windows
         {
             var synthesizer = IsCustomMode ? CustomMidiSource.Synthesizer : Synthesizer;
 
-            synthesizer.AttackDuration = TimeSpan.FromMilliseconds(10);
+            synthesizer.AttackDuration = TimeSpan.FromMilliseconds(500);
             synthesizer.DecayDuration = TimeSpan.FromMilliseconds(4000);
             synthesizer.Sustain = 0;
             synthesizer.ReleaseDuration = TimeSpan.FromMilliseconds(4000);

@@ -9,6 +9,7 @@ namespace KSynthesizer.Filters
     {
         Average,
         Trim,
+        Sum,
     }
 
     public class MixerFilter : IAudioSource
@@ -22,7 +23,7 @@ namespace KSynthesizer.Filters
 
         public int NumberOfSources { get; private set; }
 
-        public MixerMode Mode { get; set; } = MixerMode.Trim;
+        public MixerMode Mode { get; set; } = MixerMode.Sum;
 
         public float TrimVolume { get; set; } = 0.7f;
 
@@ -75,7 +76,19 @@ namespace KSynthesizer.Filters
                             val = Math.Min(1, Math.Max(-1, val * TrimVolume));
                             break;
                     }
-                    buf[i] = val;
+
+                    if (val >= 1)
+                    {
+                        buf[i] = 1;
+                    }
+                    else if (val <= -1)
+                    {
+                        buf[i] = -1;
+                    }
+                    else
+                    {
+                        buf[i] = val;
+                    }
                 }
             }
 
