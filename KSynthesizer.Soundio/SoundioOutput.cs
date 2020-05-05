@@ -4,7 +4,7 @@ using SoundIOSharp;
 
 namespace KSynthesizer.Soundio
 {
-    public class SoundioOutput : IAudioOutput
+    public class SoundioOutput : IAudioOutput, IClock
     {
         private readonly SoundIO api = new SoundIO();
         private RingBuffer<float> ringBuffer;
@@ -31,8 +31,10 @@ namespace KSynthesizer.Soundio
         }
 
         public event EventHandler Underflow;
-
-        public event EventHandler<int> WillFilled;
+        
+        public event EventHandler Tick;
+        
+        public bool IsRunning { get; private set; }
 
         public SoundIODevice Device { get; private set; }
 
@@ -45,6 +47,8 @@ namespace KSynthesizer.Soundio
         public TimeSpan DesiredLatency { get; set; } = TimeSpan.FromMilliseconds(10);
         
         public TimeSpan ActualLatency { get; private set; }
+        
+        public int DesiredFillSize => (int)Math.Ceiling(DesiredLatency.TotalSeconds * Format.SampleRate * Format.Channels);
 
         public void Write(float[] buffer)
         {
@@ -88,6 +92,7 @@ namespace KSynthesizer.Soundio
             }
             
             outstream.Open();
+            outstream.Layout = SoundIOChannelLayout.GetDefault(Format.Channels);
             outstream.SoftwareLatency = DesiredLatency.TotalSeconds;
             api.FlushEvents();
 
@@ -97,11 +102,13 @@ namespace KSynthesizer.Soundio
 
         public void Play()
         {
+            IsRunning = true;
             outstream.Start();
         }
 
         public void Stop()
         {
+            IsRunning = false;
             outstream?.Dispose();
             outstream = null;
         }
@@ -113,22 +120,21 @@ namespace KSynthesizer.Soundio
         }
         
         void write_callback(SoundIOOutStream outstream, int frame_count_min, int frame_count_max)
-        {            
-            double desiredSize = DesiredLatency.TotalSeconds * Format.SampleRate * Format.Channels;
-            int frame_count = (int)Math.Max(frame_count_min, desiredSize);
-            frame_count = Math.Min(frame_count, frame_count_max);
-            if (frame_count == 0)
+        {
+            Tick?.Invoke(this, EventArgs.Empty);
+            var frameCount = (int)Math.Max(frame_count_min, DesiredFillSize);
+            frameCount = Math.Min(frameCount, frame_count_max);
+            if (frameCount == 0)
             {
                 return;
             }
 
-            var results = outstream.BeginWrite(ref frame_count);
-            WillFilled?.Invoke(this, frame_count);
-            var samples = new float[frame_count];
-            ringBuffer.Dequeue(samples);
+            var results = outstream.BeginWrite(ref frameCount);
+            var samples = new float[frameCount];
+            ringBuffer.Dequeue(samples, frameCount);
 
-            SoundIOChannelLayout layout = outstream.Layout;
-            for (int frame = 0; frame < frame_count; frame++)
+            var layout = outstream.Layout;
+            for (int frame = 0; frame < frameCount; frame++)
             {
                 for (int channel = 0; channel < layout.ChannelCount; channel++)
                 {

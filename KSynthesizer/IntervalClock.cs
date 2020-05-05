@@ -3,14 +3,14 @@ using System.Threading;
 
 namespace KSynthesizer
 {
-    public class Clock
+    public class IntervalClock : IClock
     {
         private Thread thread;
         private readonly object lockObj = new object();
 
         public event EventHandler Tick;
         
-        public Clock(TimeSpan interval)
+        public IntervalClock(TimeSpan interval)
         {
             Interval = interval;
         }

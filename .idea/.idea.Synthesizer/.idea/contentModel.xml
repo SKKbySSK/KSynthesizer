@@ -28,7 +28,6 @@
         <e p="AudioFormat.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="BufferSink.cs" t="Include" />
-        <e p="Clock.cs" t="Include" />
         <e p="Easing.cs" t="Include" />
         <e p="Envelopes" t="Include">
           <e p="EnvelopeGenerator.cs" t="Include" />
@@ -45,10 +44,13 @@
           <e p="FrequencyFilter.cs" t="Include" />
           <e p="FrequencyModulationFilter.cs" t="Include" />
           <e p="MixerFilter.cs" t="Include" />
+          <e p="RecordFilter.cs" t="Include" />
         </e>
         <e p="IAudioFilter.cs" t="Include" />
         <e p="IAudioOutput.cs" t="Include" />
         <e p="IAudioSource.cs" t="Include" />
+        <e p="IClock.cs" t="Include" />
+        <e p="IntervalClock.cs" t="Include" />
         <e p="KSynthesizer.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive">
           <e p="x64" t="Include">

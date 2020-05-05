@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using KSynthesizer.Filters;
 using KSynthesizer.Sources;
 
 namespace KSynthesizer.Soundio.Test
@@ -9,10 +11,10 @@ namespace KSynthesizer.Soundio.Test
         
         private static PeriodicFunctionsSource Source { get; set; }
         
-        private static Clock Clock { get; set; }
+        private static  RecordFilter RecordFilter { get; set; }
 
         private static bool Playing { get; set; } = true;
-        
+
         static void Main(string[] args)
         {
             var output = new SoundioOutput();
@@ -39,13 +41,11 @@ namespace KSynthesizer.Soundio.Test
                 Volume = 1,
             };
             Source.SetFrequency(440);
-
-            var clock = new Clock(output.ActualLatency);
-            clock.Tick += ClockOnTick;
-            Clock = clock;
-            clock.Start();
+            RecordFilter = new RecordFilter(Source);
+            
+            Output.Tick += OutputOnTick;
             Output.Play();
-            Console.WriteLine("Player and Clock started");
+            Console.WriteLine("Player started");
 
             bool exit = false;
             while(!exit)
@@ -56,7 +56,21 @@ namespace KSynthesizer.Soundio.Test
                 {
                     case ConsoleKey.P:
                         Playing = !Playing;
-                        Console.WriteLine(Playing ? "Playing" : "Paused");
+                        Console.WriteLine(Playing ? "Resumed" : "Paused");
+                        break;
+                    case ConsoleKey.R:
+                        if (RecordFilter.IsRecording)
+                        {
+                            RecordFilter.StopRecording();
+                        }
+                        else
+                        {
+                            var now = DateTime.Now;
+                            var name = $"{now.Ticks}.wav";
+                            RecordFilter.StartRecording(new FileStream(name, FileMode.Create, FileAccess.Write), true, false);
+                            Console.WriteLine("Output : " + name);
+                        }
+                        Console.WriteLine(RecordFilter.IsRecording ? "Recording Started" : "Recording Stopped");
                         break;
                     case ConsoleKey.Escape:
                         exit = true;
@@ -67,25 +81,19 @@ namespace KSynthesizer.Soundio.Test
                 }
             }
             
-            clock.Stop();
             output.Dispose();
             Console.WriteLine("Exited");
         }
 
-        private static void ClockOnTick(object? sender, EventArgs e)
+        private static void OutputOnTick(object? sender, EventArgs e)
         {
-            var addInterval = TimeSpan.FromMilliseconds(10);
-            var elapsed = (Clock.Interval + addInterval).TotalSeconds;
-            var size = elapsed * Output.Format.Channels * Output.Format.SampleRate *
-                Output.Format.BitDepth / 8;
-
             if (Playing)
             {
-                Output.Write(Source.Next((int)Math.Round(size)));
+                Output.Write(RecordFilter.Next(Output.DesiredFillSize));
             }
             else
             {
-                Output.Write(new float[(int)Math.Round(size)]);
+                Output.Write(new float[Output.DesiredFillSize]);
             }
         }
     }

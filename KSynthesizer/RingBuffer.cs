@@ -10,7 +10,7 @@ namespace KSynthesizer
     /// Please talk to Bogdan before modifying this class.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class RingBuffer<T> where T : struct
+    public class RingBuffer<T> where T : unmanaged
     {
         private int _lock;
         private readonly uint _capacity;
@@ -139,7 +139,7 @@ namespace KSynthesizer
 
             // if _tail is close to the end of the array
             int howManyTillEnd = (_capacity - _tail) < howManyToAdd ? (int)(_capacity - _tail) : howManyToAdd;
-            Array.Copy(items,0,_buffer,_tail, howManyTillEnd);
+            CopyUnsafe(items,0,_buffer,_tail, (uint)howManyTillEnd);
             _tail += (uint)howManyTillEnd-1;
 
             if(_tail > _capacity)
@@ -255,9 +255,7 @@ namespace KSynthesizer
         /// the destination array. If not enough items are available, the destination array will be filled
         /// with the available items.
         /// </summary>
-        /// <param name="destination">The destination array in which items will be dequeued.</param>
-        /// <returns>The number of items that were actually returned.</returns>
-        public uint Dequeue(Array destination)
+        public uint Dequeue(T[] destination, int length)
         {
             if (_isEmpty)
                 return 0;
@@ -267,20 +265,20 @@ namespace KSynthesizer
             uint howManyToDequeue;
 
             // determine how many items we can actually dequeue
-            if( destination.Length >= available )
+            if(length >= available)
             {
                 howManyToDequeue = available;
                 _isEmpty = true;
             }
             else
             {
-                howManyToDequeue = (uint)destination.Length;
+                howManyToDequeue = (uint)length;
             }
             
             if( _tail < _head )
             {
                 uint howManyTillEnd = _capacity - _head > howManyToDequeue ? howManyToDequeue : _capacity - _head;
-                Array.Copy(_buffer, _head, destination, 0, howManyTillEnd);
+                CopyUnsafe(_buffer, _head, destination, 0, howManyTillEnd);
                 _head += howManyTillEnd;
                 if( _head > _capacity )
                     throw new ArithmeticException("There is a bug in the ring buffer!");
@@ -288,7 +286,7 @@ namespace KSynthesizer
                     _head = 0;
                 if( howManyToDequeue > howManyTillEnd )
                 {
-                    Array.Copy(_buffer, _head, destination, howManyTillEnd, howManyToDequeue - howManyTillEnd);
+                    CopyUnsafe(_buffer, _head, destination, howManyTillEnd, howManyToDequeue - howManyTillEnd);
                     _head += howManyToDequeue - howManyTillEnd;
                 }
             }
@@ -297,7 +295,7 @@ namespace KSynthesizer
                 if( _tail - _head + 1 < howManyToDequeue )
                     throw new ArithmeticException("There is a bug in the ring buffer!");
 
-                Array.Copy(_buffer,_head, destination, 0, howManyToDequeue);
+                CopyUnsafe(_buffer,_head, destination, 0, howManyToDequeue);
                 _head += howManyToDequeue;
             }
 
@@ -310,6 +308,17 @@ namespace KSynthesizer
             }
 
             return howManyToDequeue;
+        }
+    
+        private unsafe void CopyUnsafe(T[] source, uint sourceIndex, T[] dest, uint destIndex, uint length) {
+            fixed (T* src = source)
+            fixed (T* dst = dest)
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    dst[destIndex + i] = src[sourceIndex + i];
+                }
+            }
         }
     }
 }
