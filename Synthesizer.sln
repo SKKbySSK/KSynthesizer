@@ -9,11 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KSynthesizer.Linux", "KSynt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KSynthesizer.Soundio", "KSynthesizer.Soundio\KSynthesizer.Soundio.csproj", "{ACF681DD-7915-4AEF-9125-9C806A3FCC93}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSynthesizer.Midi", "KSynthesizer.Midi\KSynthesizer.Midi.csproj", "{2B328FCC-6472-406D-BE79-F4E2B167594E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KSynthesizer.Midi", "KSynthesizer.Midi\KSynthesizer.Midi.csproj", "{2B328FCC-6472-406D-BE79-F4E2B167594E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GSynthesizer.Windows", "GSynthesizer.Windows\GSynthesizer.Windows.csproj", "{1125686B-A0CC-423D-9699-B857E90FF5E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GSynthesizer.Windows", "GSynthesizer.Windows\GSynthesizer.Windows.csproj", "{1125686B-A0CC-423D-9699-B857E90FF5E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSynthesizer.Soundio.Test", "KSynthesizer.Soundio.Test\KSynthesizer.Soundio.Test.csproj", "{B8C7EDA1-9DEE-4202-B200-33C0BB408544}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KSynthesizer.Soundio.Test", "KSynthesizer.Soundio.Test\KSynthesizer.Soundio.Test.csproj", "{B8C7EDA1-9DEE-4202-B200-33C0BB408544}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,12 +47,27 @@ Global
 		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Release|x64.Build.0 = Release|Any CPU
 		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Release|x86.ActiveCfg = Release|Any CPU
 		{ACF681DD-7915-4AEF-9125-9C806A3FCC93}.Release|x86.Build.0 = Release|Any CPU
-		{1125686B-A0CC-423D-9699-B857E90FF5E3}.Debug|x64.ActiveCfg = Debug|x64
-		{1125686B-A0CC-423D-9699-B857E90FF5E3}.Debug|x64.Build.0 = Debug|x64
 		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Debug|x64.ActiveCfg = Debug|x64
 		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Debug|x64.Build.0 = Debug|x64
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Debug|x86.ActiveCfg = Debug|x64
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|x64.ActiveCfg = Debug|x64
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|x64.Build.0 = Debug|x64
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|x86.ActiveCfg = Debug|x64
+		{2B328FCC-6472-406D-BE79-F4E2B167594E}.Release|x86.Build.0 = Debug|x64
+		{1125686B-A0CC-423D-9699-B857E90FF5E3}.Debug|x64.ActiveCfg = Debug|x64
+		{1125686B-A0CC-423D-9699-B857E90FF5E3}.Debug|x64.Build.0 = Debug|x64
+		{1125686B-A0CC-423D-9699-B857E90FF5E3}.Debug|x86.ActiveCfg = Debug|x64
+		{1125686B-A0CC-423D-9699-B857E90FF5E3}.Release|x64.ActiveCfg = Debug|x64
+		{1125686B-A0CC-423D-9699-B857E90FF5E3}.Release|x64.Build.0 = Debug|x64
+		{1125686B-A0CC-423D-9699-B857E90FF5E3}.Release|x86.ActiveCfg = Debug|x64
+		{1125686B-A0CC-423D-9699-B857E90FF5E3}.Release|x86.Build.0 = Debug|x64
 		{B8C7EDA1-9DEE-4202-B200-33C0BB408544}.Debug|x64.ActiveCfg = Debug|x64
 		{B8C7EDA1-9DEE-4202-B200-33C0BB408544}.Debug|x64.Build.0 = Debug|x64
+		{B8C7EDA1-9DEE-4202-B200-33C0BB408544}.Debug|x86.ActiveCfg = Debug|x64
+		{B8C7EDA1-9DEE-4202-B200-33C0BB408544}.Release|x64.ActiveCfg = Debug|x64
+		{B8C7EDA1-9DEE-4202-B200-33C0BB408544}.Release|x64.Build.0 = Debug|x64
+		{B8C7EDA1-9DEE-4202-B200-33C0BB408544}.Release|x86.ActiveCfg = Debug|x64
+		{B8C7EDA1-9DEE-4202-B200-33C0BB408544}.Release|x86.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
