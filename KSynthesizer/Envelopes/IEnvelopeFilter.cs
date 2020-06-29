@@ -6,8 +6,6 @@ namespace KSynthesizer.Envelopes
 {
     public interface IEnvelopeFilter : IAudioFilter
     {
-        event EventHandler Released;
-
         public TimeSpan AttackDuration { get; set; }
 
         public TimeSpan DecayDuration { get; set; }

@@ -78,19 +78,8 @@ namespace KSynthesizer.Soundio
             outstream.UnderflowCallback = () => underflow_callback(outstream);
             outstream.SampleRate = Format.SampleRate;
             outstream.SoftwareLatency = DesiredLatency.TotalSeconds;
+            outstream.Format = SoundIODevice.Float32NE;
 
-            if (Device.SupportsFormat(SoundIODevice.Float32NE))
-            {
-                outstream.Format = SoundIODevice.Float32NE;
-            }
-            else
-            {
-                outstream.Dispose();
-                outstream = null;
-                
-                throw new OutputInitializationException($"No suitable format");
-            }
-            
             outstream.Open();
             outstream.Layout = SoundIOChannelLayout.GetDefault(Format.Channels);
             outstream.SoftwareLatency = DesiredLatency.TotalSeconds;
@@ -116,6 +105,13 @@ namespace KSynthesizer.Soundio
         public void Dispose()
         {
             Stop();
+
+            foreach (var device in Devices)
+            {
+                device.RemoveReference();
+            }
+
+            api.Disconnect();
             api.Dispose();
         }
         

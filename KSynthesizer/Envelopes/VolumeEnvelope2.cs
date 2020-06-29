@@ -11,8 +11,6 @@ namespace KSynthesizer.Envelopes
             Source = source;
         }
 
-        public event EventHandler Released;
-
         public TimeSpan AttackDuration { get; set; } = TimeSpan.FromMilliseconds(500);
 
         public TimeSpan DecayDuration { get; set; } = TimeSpan.FromMilliseconds(500);
@@ -61,17 +59,10 @@ namespace KSynthesizer.Envelopes
         public float[] Next(int size)
         {
             var buffer = Source.Next(size);
-            var isIdle = Generator.State == EnvelopeGenerator.EnvelopeState.Idle;
 
             for (int i = 0; buffer.Length > i; i++)
             {
                 buffer[i] *= Generator.Process();
-
-                if (Generator.State == EnvelopeGenerator.EnvelopeState.Idle && !isIdle)
-                {
-                    Released?.Invoke(this, EventArgs.Empty);
-                    isIdle = true;
-                }
             }
 
             return buffer;

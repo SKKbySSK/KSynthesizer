@@ -22,6 +22,7 @@ namespace KSynthesizer.Midi
     public class MidiPlayer : IAudioSource
     {
         private List<int> sustains = new List<int>();
+        private Dictionary<int, int> channelMap = new Dictionary<int, int>();
         private bool sustainPedal = false;
 
         private MidiBuffer MidiBuffer { get; set; }
@@ -30,11 +31,20 @@ namespace KSynthesizer.Midi
 
         public event EventHandler Finished;
 
-        public MidiPlayer(int sampleRate, MidiFile midi)
+        public MidiPlayer(int sampleRate, Synthesizer synthesizer = null)
         {
             Format = new AudioFormat(sampleRate, 1, 32);
-            MidiBuffer = new MidiBuffer(Format.SampleRate, midi);
-            Synthesizer = new Synthesizer(Format.SampleRate, MidiBuffer.Channels.Count);
+            Synthesizer = synthesizer ?? new Synthesizer(Format.SampleRate, MidiBuffer.Channels.Count);
+        }
+
+        public void Open(MidiFile file)
+        {
+            MidiBuffer = new MidiBuffer(Format.SampleRate, file);
+
+            for (int i = 0; i < MidiBuffer.Channels.Count; i++)
+            {
+                channelMap[MidiBuffer.Channels[i]] = i;
+            }
         }
 
         public AudioFormat Format { get; }
@@ -45,11 +55,17 @@ namespace KSynthesizer.Midi
 
         public TimeSpan SustainPedalDuration { get; set; } = TimeSpan.FromMilliseconds(200);
 
-        public List<OscillatorConfig> OscillatorConfigs { get; } = new List<OscillatorConfig>();
+        public List<Oscillator> OscillatorConfigs { get; } = new List<Oscillator>();
 
         public float[] Next(int size)
         {
             var buffer = new float[size];
+
+            if (MidiBuffer == null)
+            {
+                return buffer;
+            }
+
             for (int i = 0; size > i; i++)
             {
                 buffer[i] = MidiBuffer.Next(HandleEvent, ReadNext, OnFinished);
@@ -119,15 +135,10 @@ namespace KSynthesizer.Midi
                     else
                     {
                         sustainPedal = false;
-                        var inputs = Synthesizer.GetInputs();
-                        foreach(var input in inputs)
-                        {
-                            if (sustains.Contains(input.Key))
-                            {
-                                input.Value.Envelope.ReleaseDuration = SustainPedalDuration;
-                                Synthesizer.Release(input.Key);
-                            }
-                        }
+                        var index = channelMap[e.Channel];
+                        var input = Synthesizer.GetInput(index);
+                        input.Envelope.ReleaseDuration = SustainPedalDuration;
+                        input.Envelope.Release();
                         sustains.Clear();
                     }
                     return true;

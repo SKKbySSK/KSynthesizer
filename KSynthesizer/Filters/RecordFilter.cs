@@ -20,7 +20,6 @@ namespace KSynthesizer.Filters
     {
         private Thread thread;
         private readonly UnionArray buffer;
-        private readonly short[] writeBuffer;
         private readonly RingBuffer<float> ringBuffer;
         private readonly object lockObj = new object();
 

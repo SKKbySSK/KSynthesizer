@@ -2,45 +2,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.Concurrent;
 
 namespace KSynthesizer.Filters
 {
     public enum MixerMode
     {
         Average,
-        Trim,
         Sum,
     }
 
     public class MixerFilter : IAudioSource
     {
-        private readonly object lockObj = new object();
         private readonly List<IAudioSource> sources = new List<IAudioSource>();
+        private bool modified = true;
+        private IAudioSource[] readingSources;
 
         public AudioFormat Format => Sources.FirstOrDefault()?.Format ?? new AudioFormat(44100, 1, 32);
 
         public IReadOnlyList<IAudioSource> Sources => sources;
 
-        public int NumberOfSources { get; private set; }
-
         public MixerMode Mode { get; set; } = MixerMode.Sum;
-
-        public float TrimVolume { get; set; } = 0.7f;
 
         public float Volume { get; set; } = 1;
         
         public unsafe virtual float[] Next(int size)
         {
-            if (NumberOfSources == 1 && Mode == MixerMode.Average)
+            if (modified)
             {
-                lock (lockObj)
+                lock (((System.Collections.ICollection)sources).SyncRoot)
                 {
-                    return sources[0].Next(size);
+                    readingSources = sources.ToArray();
+                    modified = false;
                 }
             }
 
+            if (readingSources.Length == 1)
+            {
+                return readingSources[0].Next(size);
+            }
+
             var buffer = new float[size];
-            if (NumberOfSources == 0)
+            if (readingSources.Length == 0)
             {
                 return buffer;
             }
@@ -48,18 +51,15 @@ namespace KSynthesizer.Filters
             float val;
             fixed (float* buf = buffer)
             {
-                lock (lockObj)
+                for (int i = 0; readingSources.Length > i; i++)
                 {
-                    for(int i = 0; NumberOfSources > i; i++)
+                    var source = readingSources[i];
+                    var sourceBuffer = source.Next(size);
+                    for (int bufferIndex = 0; size > bufferIndex; bufferIndex++)
                     {
-                        var source = sources[i];
-                        var sourceBuffer = source.Next(size);
-                        for (int bufferIndex = 0; size > bufferIndex; bufferIndex++)
+                        fixed (float* srcBuf = sourceBuffer)
                         {
-                            fixed (float* srcBuf = sourceBuffer)
-                            {
-                                buf[bufferIndex] += srcBuf[bufferIndex];
-                            }
+                            buf[bufferIndex] += srcBuf[bufferIndex];
                         }
                     }
                 }
@@ -70,10 +70,7 @@ namespace KSynthesizer.Filters
                     switch(Mode)
                     {
                         case MixerMode.Average:
-                            val = val * Volume / NumberOfSources;
-                            break;
-                        case MixerMode.Trim:
-                            val = Math.Min(1, Math.Max(-1, val * TrimVolume));
+                            val = val * Volume / readingSources.Length;
                             break;
                     }
 
@@ -97,37 +94,37 @@ namespace KSynthesizer.Filters
 
         public void AddSources(IEnumerable<IAudioSource> sources)
         {
-            lock(lockObj)
+            lock (((System.Collections.ICollection)this.sources).SyncRoot)
             {
                 this.sources.AddRange(sources);
-                NumberOfSources = this.sources.Count;
+                modified = true;
             }
         }
 
         public void AddSource(IAudioSource source)
         {
-            lock (lockObj)
+            lock (((System.Collections.ICollection)sources).SyncRoot)
             {
                 sources.Add(source);
-                NumberOfSources = sources.Count;
+                modified = true;
             }
         }
 
         public void RemoveSource(IAudioSource source)
         {
-            lock (lockObj)
+            lock (((System.Collections.ICollection)sources).SyncRoot)
             {
                 sources.Remove(source);
-                NumberOfSources = sources.Count;
+                modified = true;
             }
         }
 
         public void ClearSources()
         {
-            lock(lockObj)
+            lock (((System.Collections.ICollection)sources).SyncRoot)
             {
                 sources.Clear();
-                NumberOfSources = 0;
+                modified = true;
             }
         }
     }

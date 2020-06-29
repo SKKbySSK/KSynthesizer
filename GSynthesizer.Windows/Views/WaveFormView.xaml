@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="GSynthesizer.Windows.Views.WaveFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:oxy="http://oxyplot.org/wpf"
+             xmlns:skia="clr-namespace:Orc.Skia;assembly=Orc.Skia" 
+             prism:ViewModelLocator.AutoWireViewModel="True" >
+    <Grid>
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem x:Name="saveImage" Header="画像を保存する" Click="saveImage_Click"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
+        <oxy:PlotView x:Name="plotView" IsEnabled="False" Margin="5"/>
+    </Grid>
+</UserControl>

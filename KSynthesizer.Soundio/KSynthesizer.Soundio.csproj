@@ -20,11 +20,13 @@
     <ItemGroup>
       <Compile Remove="submodule\libsoundio-sharp.Tests\**" />
       <Compile Remove="submodule\example\**" />
+      <Compile Remove="submodule\external\**" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Remove="submodule\libsoundio-sharp.Tests\**" />
       <EmbeddedResource Remove="submodule\example\**" />
+      <EmbeddedResource Remove="submodule\external\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -35,5 +37,6 @@
       <None Remove="submodule\Makefile" />
       <None Remove="submodule\README.md" />
       <None Remove="submodule\example\**" />
+      <None Remove="submodule\external\**" />
     </ItemGroup>
 </Project>
