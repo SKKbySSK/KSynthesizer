@@ -31,14 +31,30 @@ namespace KSynthesizer.Filters
         {
             Mode = FrequencyFilterMode.Lowpass;
             CutoffLow = cutoff;
-            filter = BiQuadFilter.LowPassFilter(Format.SampleRate, cutoff, 1);
+
+            if (filter != null)
+            {
+                filter.SetLowPassFilter(Format.SampleRate, cutoff, 1);
+            }
+            else
+            {
+                filter = BiQuadFilter.LowPassFilter(Format.SampleRate, cutoff, 1);
+            }
         }
 
         public void SetHighpassMode(float cutoff)
         {
             Mode = FrequencyFilterMode.Highpass;
             CutoffHigh = cutoff;
-            filter = BiQuadFilter.HighPassFilter(Format.SampleRate, cutoff, 1);
+
+            if (filter != null)
+            {
+                filter.SetHighPassFilter(Format.SampleRate, cutoff, 1);
+            }
+            else
+            {
+                filter = BiQuadFilter.HighPassFilter(Format.SampleRate, cutoff, 1);
+            }
         }
 
         public void SetBandpassMode(float cutoffLow, float cutoffHigh)
@@ -48,7 +64,15 @@ namespace KSynthesizer.Filters
             CutoffHigh = cutoffHigh;
             float center = cutoffLow + ((cutoffHigh - cutoffLow) / 2);
             float q = center / (cutoffHigh - cutoffLow);
-            filter = BiQuadFilter.BandPassFilterConstantSkirtGain(Format.SampleRate, center, q);
+            
+            if (filter != null)
+            {
+                filter.SetBandPassFilter(Format.SampleRate, center, q);
+            }
+            else
+            {
+                filter = BiQuadFilter.BandPassFilterConstantSkirtGain(Format.SampleRate, center, q);
+            }
         }
 
         public void ChangeFrequency(float cutoffLow, float cutoffHigh)

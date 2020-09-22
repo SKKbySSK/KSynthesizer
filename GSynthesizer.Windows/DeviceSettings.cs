@@ -13,7 +13,7 @@ namespace GSynthesizer
 {
     public class DeviceSettings : BindableBase
     {
-        public static AudioFormat SharedFormat { get; } = new AudioFormat(48000, 1, 32);
+        public static AudioFormat SharedFormat { get; } = new AudioFormat(48000, 1, 16);
 
         public IAudioOutput Output { get; private set; }
 

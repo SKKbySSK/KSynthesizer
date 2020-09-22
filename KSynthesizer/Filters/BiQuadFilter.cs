@@ -119,6 +119,23 @@ namespace KSynthesizer.Filters
             SetCoefficients(aa0, aa1, aa2, b0, b1, b2);
         }
 
+        public void SetBandPassFilter(float sampleRate, float centreFrequency, float q)
+        {
+            // H(s) = s / (s^2 + s/Q + 1)  (constant skirt gain, peak gain = Q)
+            var w0 = 2 * Math.PI * centreFrequency / sampleRate;
+            var cosw0 = Math.Cos(w0);
+            var sinw0 = Math.Sin(w0);
+            var alpha = sinw0 / (2 * q);
+
+            var b0 = sinw0 / 2; // =   Q*alpha
+            var b1 = 0;
+            var b2 = -sinw0 / 2; // =  -Q*alpha
+            var a0 = 1 + alpha;
+            var a1 = -2 * cosw0;
+            var a2 = 1 - alpha;
+            SetCoefficients(a0, a1, a2, b0, b1, b2);
+        }
+
         /// <summary>
         /// Create a low pass filter
         /// </summary>
@@ -144,19 +161,9 @@ namespace KSynthesizer.Filters
         /// </summary>
         public static BiQuadFilter BandPassFilterConstantSkirtGain(float sampleRate, float centreFrequency, float q)
         {
-            // H(s) = s / (s^2 + s/Q + 1)  (constant skirt gain, peak gain = Q)
-            var w0 = 2 * Math.PI * centreFrequency / sampleRate;
-            var cosw0 = Math.Cos(w0);
-            var sinw0 = Math.Sin(w0);
-            var alpha = sinw0 / (2 * q);
-
-            var b0 = sinw0 / 2; // =   Q*alpha
-            var b1 = 0;
-            var b2 = -sinw0 / 2; // =  -Q*alpha
-            var a0 = 1 + alpha;
-            var a1 = -2 * cosw0;
-            var a2 = 1 - alpha;
-            return new BiQuadFilter(a0, a1, a2, b0, b1, b2);
+            var filter = new BiQuadFilter();
+            filter.SetBandPassFilter(sampleRate, centreFrequency, q);
+            return filter;
         }
 
         /// <summary>

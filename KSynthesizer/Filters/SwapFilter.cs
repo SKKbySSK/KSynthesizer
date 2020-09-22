@@ -37,7 +37,7 @@ namespace KSynthesizer.Filters
                 outputSource = null;
                 if (output != null)
                 {
-                    OnDispose?.Invoke(outputSource);
+                    OnDispose?.Invoke(output);
                 }
 
                 currentSource = value;
