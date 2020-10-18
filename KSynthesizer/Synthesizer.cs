@@ -9,6 +9,15 @@ namespace KSynthesizer
 {
     public class Oscillator
     {
+        public Oscillator() { }
+
+        public Oscillator(FunctionType function, float frequency, float volume)
+        {
+            Function = function;
+            Frequency = frequency;
+            Volume = volume;
+        }
+
         public FunctionType Function { get; set; } = FunctionType.Sin;
 
         public float Frequency { get; set; } = 440;

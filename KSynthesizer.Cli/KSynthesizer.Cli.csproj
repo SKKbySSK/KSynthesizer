@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ConsoleAppFramework" Version="3.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KSynthesizer.Midi\KSynthesizer.Midi.csproj" />
+    <ProjectReference Include="..\KSynthesizer.Soundio\KSynthesizer.Soundio.csproj" />
+    <ProjectReference Include="..\KSynthesizer\KSynthesizer.csproj" />
+  </ItemGroup>
+
+</Project>
