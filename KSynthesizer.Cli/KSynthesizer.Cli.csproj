@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="ConsoleAppFramework" Version="3.2.0" />
+    <PackageReference Include="System.IO.Ports" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>

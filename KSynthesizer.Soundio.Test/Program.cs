@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using KSynthesizer.Filters;
+using KSynthesizer.Midi;
 using KSynthesizer.Sources;
+using Melanchall.DryWetMidi.Core;
 
 namespace KSynthesizer.Soundio.Test
 {
@@ -14,6 +16,8 @@ namespace KSynthesizer.Soundio.Test
         private static  RecordFilter RecordFilter { get; set; }
 
         private static bool Playing { get; set; } = true;
+
+        private static int Frequency { get; set; } = 440;
 
         static void Main(string[] args)
         {
@@ -30,7 +34,7 @@ namespace KSynthesizer.Soundio.Test
             var intervalMs = Double.Parse(Console.ReadLine());
 
             output.DesiredLatency = TimeSpan.FromMilliseconds(intervalMs);
-            output.Initialize(output.Devices[outputIndex], new AudioFormat(48000, 1, 32));
+            output.Initialize(output.Devices[outputIndex], new AudioFormat(48000, 1, 16));
             Output = output;
             Console.WriteLine("Output device initialized");
             Console.WriteLine($"Actual Latency : {output.ActualLatency.TotalMilliseconds}ms");
@@ -40,10 +44,15 @@ namespace KSynthesizer.Soundio.Test
                 Function = FunctionType.Sin,
                 Volume = 1,
             };
-            Source.SetFrequency(440);
-            RecordFilter = new RecordFilter(Source);
+
+            var midi = new MidiPlayer(output.Format.SampleRate, new Synthesizer(output.Format.SampleRate));
+            midi.OscillatorConfigs.Add(new Oscillator() { Function = KSynthesizer.Sources.FunctionType.Sin, Volume = 0.3f });
+            midi.Open(MidiFile.Read("sample.mid"));
             
-            Output.Tick += OutputOnTick;
+            Source.SetFrequency(Frequency);
+            RecordFilter = new RecordFilter(midi);
+            
+            Output.Buffer += OutputOnBuffer;
             Output.Play();
             Console.WriteLine("Player started");
 
@@ -72,6 +81,20 @@ namespace KSynthesizer.Soundio.Test
                         }
                         Console.WriteLine(RecordFilter.IsRecording ? "Recording Started" : "Recording Stopped");
                         break;
+                    case ConsoleKey.UpArrow:
+                        Frequency += 100;
+                        Source.SetFrequency(Frequency);
+                        Console.WriteLine($"Frequency : {Frequency}Hz");
+                        break;
+                    case ConsoleKey.DownArrow:
+                        Frequency -= 100;
+                        if (Frequency <= 300)
+                        {
+                            Frequency = 300;
+                        }
+                        Source.SetFrequency(Frequency);
+                        Console.WriteLine($"Frequency : {Frequency}Hz");
+                        break;
                     case ConsoleKey.Escape:
                         exit = true;
                         break;
@@ -85,15 +108,15 @@ namespace KSynthesizer.Soundio.Test
             Console.WriteLine("Exited");
         }
 
-        private static void OutputOnTick(object? sender, EventArgs e)
+        private static void OutputOnBuffer(object? sender, OutputBufferEventArgs e)
         {
             if (Playing)
             {
-                Output.Write(RecordFilter.Next(Output.DesiredFillSize));
+                e.Buffer = RecordFilter.Next(e.Size);
             }
             else
             {
-                Output.Write(new float[Output.DesiredFillSize]);
+                e.Buffer = new float[e.Size];
             }
         }
     }

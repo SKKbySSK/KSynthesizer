@@ -66,7 +66,7 @@ namespace KSynthesizer.Filters
 
                 for (int i = 0; size > i; i++)
                 {
-                    val = buf[i];
+                    val = buf[i] * Volume;
                     switch(Mode)
                     {
                         case MixerMode.Average:

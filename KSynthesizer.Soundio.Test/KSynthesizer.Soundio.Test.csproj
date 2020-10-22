@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\KSynthesizer.Midi\KSynthesizer.Midi.csproj" />
       <ProjectReference Include="..\KSynthesizer.Soundio\KSynthesizer.Soundio.csproj" />
     </ItemGroup>
 

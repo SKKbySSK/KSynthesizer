@@ -4,7 +4,19 @@ using SoundIOSharp;
 
 namespace KSynthesizer.Soundio
 {
-    public class SoundioOutput : IAudioOutput, IClock
+    public class OutputBufferEventArgs : EventArgs
+    {
+        public OutputBufferEventArgs(int size)
+        {
+            Size = size;
+        }
+
+        public int Size { get; }
+        
+        public float[] Buffer { get; set; }
+    }
+    
+    public class SoundioOutput : IAudioOutput
     {
         private readonly SoundIO api = new SoundIO();
         private RingBuffer<float> ringBuffer;
@@ -18,21 +30,18 @@ namespace KSynthesizer.Soundio
             for (int i = 0; api.OutputDeviceCount > i; i++)
             {
                 var device = api.GetOutputDevice(i);
-                if (device.SupportsFormat(SoundIODevice.Float32NE))
+                if (i == api.DefaultOutputDeviceIndex)
                 {
-                    if (i == api.DefaultOutputDeviceIndex)
-                    {
-                        DefaultDevice = device;
-                    }
-
-                    Devices.Add(device);
+                    DefaultDevice = device;
                 }
+
+                Devices.Add(device);
             }
         }
 
         public event EventHandler Underflow;
         
-        public event EventHandler Tick;
+        public event EventHandler<OutputBufferEventArgs> Buffer;
         
         public bool IsRunning { get; private set; }
 
@@ -48,18 +57,16 @@ namespace KSynthesizer.Soundio
         
         public TimeSpan ActualLatency { get; private set; }
         
-        public int DesiredFillSize => (int)Math.Ceiling(DesiredLatency.TotalSeconds * Format.SampleRate * Format.Channels);
-
-        public void Write(float[] buffer)
+        private void Write(float[] buffer)
         {
             ringBuffer.Enqueue(buffer);
         }
         
         public void Initialize(SoundIODevice device, AudioFormat format)
         {
-            if (format.Channels != 1 || format.BitDepth != 32)
+            if (format.Channels != 1)
             {
-                throw new OutputInitializationException("Format must qualify channels == 1 && bitDepth == 32");
+                throw new OutputInitializationException("Format must qualify channels == 1");
             }
             
             Device = device;
@@ -78,7 +85,7 @@ namespace KSynthesizer.Soundio
             outstream.UnderflowCallback = () => underflow_callback(outstream);
             outstream.SampleRate = Format.SampleRate;
             outstream.SoftwareLatency = DesiredLatency.TotalSeconds;
-            outstream.Format = SoundIODevice.Float32NE;
+            outstream.Format = SoundIODevice.S16NE;
 
             outstream.Open();
             outstream.Layout = SoundIOChannelLayout.GetDefault(Format.Channels);
@@ -117,16 +124,22 @@ namespace KSynthesizer.Soundio
         
         void write_callback(SoundIOOutStream outstream, int frame_count_min, int frame_count_max)
         {
-            Tick?.Invoke(this, EventArgs.Empty);
-            var frameCount = (int)Math.Max(frame_count_min, DesiredFillSize);
-            frameCount = Math.Min(frameCount, frame_count_max);
-            if (frameCount == 0)
+            int frameCount = frame_count_max;
+            if (frameCount <= 0)
             {
                 return;
             }
-
+            
             var results = outstream.BeginWrite(ref frameCount);
             var samples = new float[frameCount];
+            
+            var e = new OutputBufferEventArgs(frameCount);
+            Buffer?.Invoke(this, e);
+            if (e.Buffer != null)
+            {
+                ringBuffer.Enqueue(e.Buffer);
+            }
+            
             ringBuffer.Dequeue(samples, frameCount);
 
             var layout = outstream.Layout;
@@ -135,14 +148,21 @@ namespace KSynthesizer.Soundio
                 for (int channel = 0; channel < layout.ChannelCount; channel++)
                 {
                     var area = results.GetArea(channel);
-                    write_sample(area.Pointer, samples[frame]);
+                    // Raspberry Piではなぜかshortじゃないと音がプツプツする
+                    write_short_sample(area.Pointer, samples[frame]);
                     area.Pointer += area.Step;
                 }
             }
 
             outstream.EndWrite();
 
-            unsafe void write_sample(IntPtr ptr, float sample)
+            unsafe void write_short_sample(IntPtr ptr, float sample)
+            {
+                short* buf = (short*)ptr;
+                *buf = (short)(sample * short.MaxValue);
+            }
+
+            unsafe void write_float_sample(IntPtr ptr, float sample)
             {
                 float* buf = (float*)ptr;
                 *buf = sample;
